@@ -93,3 +93,9 @@ Now let's set the carnivore sped as an evolutionary trait, which can variate bet
 
 1 - OK
 2 - ok, for now
+
+### 18. 18:19
+
+Change the colour code of the cells.
+Replace the black with a medium grey, and the dark brown (1.5 res) with a light grey.
+The dark brown and the black are too in contrast with the rest and distract the vision....

@@ -41,7 +41,7 @@ How the grid is drawn:
 
 | What you see | Meaning |
 |---|---|
-| Cell background, light brown → black | Resource in the cell, full → exhausted. A black cell is empty and has no resource left. |
+| Cell background, light brown → light grey → medium grey | Resource in the cell, full → low → exhausted. A medium grey cell is empty and has no resource left. |
 | Green square | Plant. Brighter means closer to its reproduction threshold. |
 | Blue circle | Herbivore |
 | Red circle | Carnivore |

@@ -17,7 +17,8 @@ import java.awt.RenderingHints;
 import java.io.Serial;
 
 /**
- * Draws the torus as a flat grid. Cell background: darker brown means less resource.
+ * Draws the torus as a flat grid. Cell background: the resource left in the cell, from light brown
+ * (full) through light grey (low) to medium grey (empty); see {@link #resourceColour(double)}.
  * Plants are green squares (brighter = more energy), herbivores blue circles,
  * carnivores red circles.
  */
@@ -65,8 +66,7 @@ public final class WorldPanel extends JPanel {
                 int w = (int) Math.round((x + 1) * cw) - x0;
                 int h = (int) Math.round((y + 1) * ch) - y0;
 
-                float r = (float) Math.min(1.0, world.resources().level(p) / maxResource);
-                g.setColor(new Color(0.15f + 0.35f * r, 0.10f + 0.25f * r, 0.05f + 0.10f * r));
+                g.setColor(resourceColour(world.resources().level(p) / maxResource));
                 g.fillRect(x0, y0, w, h);
                 g.setColor(GRID);
                 g.drawRect(x0, y0, w, h);
@@ -75,6 +75,35 @@ public final class WorldPanel extends JPanel {
                 world.animalAt(p).ifPresent(animal -> drawAnimal(g, animal, x0, y0, w, h));
             }
         }
+    }
+
+    /** Background for an empty cell (no resource left). */
+    static final Color EMPTY = new Color(128, 128, 128);
+    /** Background for a cell with little resource left (15% of the maximum, 1.5 of 10 by default). */
+    static final Color LOW = new Color(200, 200, 200);
+    /** Background for a full cell. */
+    static final Color FULL = new Color(128, 89, 38);
+    /** Fraction of the maximum resource at which the colour is {@link #LOW}. */
+    static final double LOW_FRACTION = 0.15;
+
+    /**
+     * Background colour for a cell, from the resource as a fraction of the maximum:
+     * medium grey when empty, light grey when low (15%), light brown when full,
+     * blending linearly in between.
+     */
+    static Color resourceColour(double fraction) {
+        double f = Math.max(0, Math.min(1, fraction));
+        if (f <= LOW_FRACTION) {
+            return blend(EMPTY, LOW, f / LOW_FRACTION);
+        }
+        return blend(LOW, FULL, (f - LOW_FRACTION) / (1 - LOW_FRACTION));
+    }
+
+    private static Color blend(Color from, Color to, double t) {
+        return new Color(
+                (int) Math.round(from.getRed() + (to.getRed() - from.getRed()) * t),
+                (int) Math.round(from.getGreen() + (to.getGreen() - from.getGreen()) * t),
+                (int) Math.round(from.getBlue() + (to.getBlue() - from.getBlue()) * t));
     }
 
     private void drawPlant(Graphics2D g, Plant plant, int x0, int y0, int w, int h) {

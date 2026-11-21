@@ -4,7 +4,7 @@ A general description of the simulation: what the world is, what lives in it, th
 
 > This manual describes the **current state** of the model. It is updated after every significant decision. For *why* things are the way they are, and for the open questions, see [decisions.md](decisions.md). For building, running and changing the parameters, see [how-to-run.md](how-to-run.md).
 >
-> Last updated: 2026-11-21 (after prompt 16).
+> Last updated: 2026-11-21 (after prompt 18).
 
 ## 1. What Toroworld is
 
@@ -107,21 +107,21 @@ Every organism carries its own **genome** of seven traits:
 
 ![Map legend](images/legend.png)
 
-**Cell background: the resource left in the cell.** It goes from light brown (full, 10) to **almost black** (exhausted, 0). The scale is dark: a half-full cell (5) is already dark brown.
+**Cell background: the resource left in the cell.** It goes from light brown (full, 10), through beige (half full, 5) and light grey (low, 1.5), to **medium grey** (empty, 0). The greys were chosen to stay calm: an exhausted cell should be visible without drawing the eye away from the organisms.
 
-> **A black cell is an empty cell whose resource is used up.** It has no plant and no animal, and it has nothing left to feed a new plant yet. It regains 1 per tick and turns brown again within a few ticks, unless a plant keeps draining it.
+> **A medium grey cell is an empty cell whose resource is used up.** It has no plant and no animal, and it has nothing left to feed a new plant yet. It regains 1 per tick: it turns light grey within a couple of ticks, then back towards brown, unless a plant keeps draining it.
 
 The colours are:
 
 | What you see | Meaning |
 |---|---|
-| Light brown | Cell with plenty of resource |
-| Dark brown → black | Cell with little or no resource left |
+| Light brown → beige | Cell with plenty of resource |
+| Light grey → medium grey | Cell with little or no resource left |
 | Green square, dark → bright | Plant. Brighter means more energy, closer to reproducing. |
 | Blue circle, white outline | Herbivore |
 | Red circle, white outline | Carnivore |
 
-On the default 100 x 50 grid each cell is only 8 pixels wide, so a plant fills almost the whole cell and the brown or black background shows only as a thin border. Black cells are usually cells that a plant drained before it died.
+On the default 100 x 50 grid each cell is only 8 pixels wide, so a plant fills almost the whole cell and the background shows only as a thin border. Grey cells are usually cells that a plant drained before it died.
 
 **Buttons**, at the top of the window: **Start/Pause**, **Step** (one tick), **Reset**, the **Speed** slider (ticks per second), and **Manual**, which opens this manual in a separate window.
 

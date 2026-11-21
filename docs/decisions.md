@@ -26,6 +26,7 @@ Status of each decision: **Agreed** (you decided), **Assumed** (I chose it to ma
 | A18 | **How sight is computed is part of each species' description** (`Mobility.visionBase`), to allow different kinds of carnivore later: vision × the organism's own speed (default for carnivores) or vision × the species' maximum speed. |
 | A19 | A **fractional speed** gives a matching chance of one extra cell per tick (M4). |
 | A20 | With no prey in sight, a carnivore **wanders one cell** per tick (M6). Agreed **for now**: to be revisited. |
+| A21 | **Cell colours** (prompt 18): the background goes from light brown (full) to light grey at 15% of the maximum (1.5 of 10), then to medium grey when empty, blending linearly. Replaces the brown-to-black scale, whose dark cells distracted the eye. |
 
 ## Assumed (please review)
 
