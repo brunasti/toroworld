@@ -4,7 +4,7 @@
 
 - **JDK 25.** Any JDK from 21 also works if you add `-PjavaRelease=21` to the Gradle commands.
 - **No Gradle installation is needed.** The wrapper (`./gradlew`) downloads Gradle 9.7.1 the first time it runs.
-- **An internet connection for the first build,** to download Gradle and JUnit.
+- **An internet connection for the first build,** to download Gradle, JUnit and commonmark-java (the Markdown library used by the manual window).
 
 ## 2. Build and test
 
@@ -35,6 +35,7 @@ The window has these controls:
 
 A run lasts a fixed number of ticks (`--ticks`, default 1000). When the last tick is reached, the run pauses, **Start** and **Step** are disabled, and the bar shows "(end)". **Reset** starts a new run.
 | **Speed** | Ticks per second, from 1 to 50 |
+| **Manual** | Opens the user manual ([manual.md](manual.md)) in a separate window. Links to the other documents open in the same window; **Manual home** goes back. |
 
 How the grid is drawn:
 

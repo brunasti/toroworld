@@ -32,6 +32,7 @@ public final class ToroworldFrame extends JFrame {
     private final JButton runButton = new JButton("Start");
     private final JButton stepButton = new JButton("Step");
     private final Timer timer;
+    private transient ManualWindow manual;
 
     public ToroworldFrame(SimulationConfig config, long totalTicks) {
         super("Toroworld");
@@ -49,6 +50,8 @@ public final class ToroworldFrame extends JFrame {
         speed.addChangeListener(e -> timer.setDelay(1000 / speed.getValue()));
 
         JButton resetButton = new JButton("Reset");
+        JButton manualButton = new JButton("Manual");
+        manualButton.addActionListener(e -> showManual());
         runButton.addActionListener(e -> toggleRun());
         stepButton.addActionListener(e -> step());
         resetButton.addActionListener(e -> reset());
@@ -59,6 +62,7 @@ public final class ToroworldFrame extends JFrame {
         controls.add(resetButton);
         controls.add(new JLabel("Speed"));
         controls.add(speed);
+        controls.add(manualButton);
 
         status.setBorder(BorderFactory.createEmptyBorder(4, 8, 4, 8));
         status.setFont(status.getFont().deriveFont(13f));
@@ -94,6 +98,14 @@ public final class ToroworldFrame extends JFrame {
             runButton.setText("Start");
         }
         updateStatus();
+    }
+
+    private void showManual() {
+        if (manual == null) {
+            manual = new ManualWindow();
+        }
+        manual.setVisible(true);
+        manual.toFront();
     }
 
     private void reset() {

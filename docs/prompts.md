@@ -76,3 +76,7 @@ How fast do the erbivorous move?
 So I don't understand the colours in the map...
 What's the meaning of a black cell?
 Maybe we should create a general description document (and update it after any significant decision) as a docs/manual.md document
+
+### 14. 17:44
+
+OK, let's add a button in the UI which open in a preview window this manual, so that when executing the application a user can read it

@@ -4,7 +4,7 @@ A general description of the simulation: what the world is, what lives in it, th
 
 > This manual describes the **current state** of the model. It is updated after every significant decision. For *why* things are the way they are, and for the open questions, see [decisions.md](decisions.md). For building, running and changing the parameters, see [how-to-run.md](how-to-run.md).
 >
-> Last updated: 2026-11-21 (after prompt 13).
+> Last updated: 2026-11-21 (after prompt 14).
 
 ## 1. What Toroworld is
 
@@ -108,6 +108,8 @@ The colours are:
 | Red circle, white outline | Carnivore |
 
 On the default 100 x 50 grid each cell is only 8 pixels wide, so a plant fills almost the whole cell and the brown or black background shows only as a thin border. Black cells are usually cells that a plant drained before it died.
+
+**Buttons**, at the top of the window: **Start/Pause**, **Step** (one tick), **Reset**, the **Speed** slider (ticks per second), and **Manual**, which opens this manual in a separate window.
 
 **Status bar**, at the bottom of the window:
 - line 1: current tick and total ticks of the run (e.g. `Tick 15 / 1000`, with "(end)" at the last tick), the number of plants, herbivores and carnivores, and the total resource in the world;

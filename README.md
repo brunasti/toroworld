@@ -17,7 +17,7 @@ Requires JDK 25 (or any JDK from 21 with `-PjavaRelease=21`).
 ./gradlew run --args="--trade-off off"          # mutation without the trait budget
 ```
 
-In the viewer: **Start/Pause**, **Step** (one tick), **Reset**, and a speed slider (ticks per second). The cell background shows the resource (darker means more depleted). Plants are green squares, herbivores are blue circles, carnivores are red circles.
+In the viewer: **Start/Pause**, **Step** (one tick), **Reset**, a speed slider (ticks per second), and **Manual**, which opens the user manual. The cell background shows the resource (darker means more depleted). Plants are green squares, herbivores are blue circles, carnivores are red circles.
 
 ## Structure
 

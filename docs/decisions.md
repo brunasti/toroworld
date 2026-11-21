@@ -21,6 +21,7 @@ Status of each decision: **Agreed** (you decided), **Assumed** (I chose it to ma
 | A13 | A **trade-off** option, on or off. When on, all the traits share **one maximum budget**: improving one trait must be paid for by another. |
 | A14 | The carnivore survival problem (O2) is parked for now. |
 | A15 | Starting populations are **densities** (fractions of the cells), so they follow the grid size. Defaults (prompt 11): plants **0.50**, herbivores **0.20**, carnivores **0.04**, i.e. 50 / 20 / 4 per 100 cells (until then 0.30 / 0.10 / 0.02). Counts are rounded to the nearest whole organism. |
+| A16 | A **Manual** button in the viewer opens `docs/manual.md` in a separate window. The Markdown is converted to HTML with the **commonmark-java** library (0.32.0, with the tables extension). The build copies `docs/*.md` and `docs/images/` into the application, so the window always shows the same text as the repository. |
 
 ## Assumed (please review)
 
@@ -31,7 +32,7 @@ Status of each decision: **Agreed** (you decided), **Assumed** (I chose it to ma
 | B1 | Gradle **Kotlin DSL** (`build.gradle.kts`), wrapper **Gradle 9.7.1**. | Kotlin DSL has better IDE completion. Gradle 9.1+ is needed to run on JDK 25. | Groovy DSL. |
 | B2 | Compiles with `--release 25` by default. Override with `-PjavaRelease=21`. The code uses only Java 21 language features. | My workspace has JDK 21, so I could only verify at level 21. | Gradle toolchains (downloads/locates the JDK automatically). |
 | B4 | JUnit 5.13.4 for tests. | Stable and certain to exist. | JUnit 6. |
-| B5 | No external runtime dependencies. | Swing is in the JDK; keeps the project simple. | |
+| B5 | Only one external runtime dependency: commonmark-java (see A16). | Swing is in the JDK; keeps the project simple. | |
 
 ### World
 

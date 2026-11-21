@@ -14,6 +14,10 @@ repositories {
 }
 
 dependencies {
+    // Markdown to HTML, for the manual window
+    implementation("org.commonmark:commonmark:0.32.0")
+    implementation("org.commonmark:commonmark-ext-gfm-tables:0.32.0")
+
     testImplementation(platform("org.junit:junit-bom:5.13.4"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
@@ -27,6 +31,14 @@ tasks.withType<JavaCompile>().configureEach {
 
 application {
     mainClass = "it.brunasti.simulations.toroworld.Toroworld"
+}
+
+// Bundle the documentation, so the viewer's Manual button shows the same text as docs/.
+tasks.processResources {
+    from("docs") {
+        include("*.md", "images/**")
+        into("manual")
+    }
 }
 
 tasks.test {
