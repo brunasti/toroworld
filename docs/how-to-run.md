@@ -107,7 +107,7 @@ return new SimulationConfig(
 **Each species** is a `SpeciesConfig(initialDensity, initialEnergy, genome, costs, efficiency)`:
 
 ```java
-new SpeciesConfig(0.30, 5.0,                                // initial density, initial energy
+new SpeciesConfig(0.50, 5.0,                                // initial density, initial energy
         new Genome(1.0, 3.0, 8.0, 0.4, 60),                 // starting genome
         new ActivityCosts(0.5, 0.0, 0.0, 0.2, 1.0),         // costs: live, rest, move, eat, reproduce
         0.8)                                                // efficiency
@@ -115,7 +115,7 @@ new SpeciesConfig(0.30, 5.0,                                // initial density, 
 
 | Parameter | Plants | Herbivores | Carnivores | Meaning |
 |---|---|---|---|---|
-| initialDensity | 0.30 | 0.10 | 0.02 | Fraction of the cells that get one organism at tick 0, placed at random. 0.10 means 10 per 100 cells. The count is rounded to the nearest whole organism: on 100x50 that is 1,500 plants, 500 herbivores and 100 carnivores. |
+| initialDensity | 0.50 | 0.20 | 0.04 | Fraction of the cells that get one organism at tick 0, placed at random. 0.20 means 20 per 100 cells. The count is rounded to the nearest whole organism: on 100x50 that is 2,500 plants, 1,000 herbivores and 200 carnivores. |
 | initialEnergy | 5.0 | 10.0 | 20.0 | Energy of each starting organism |
 | efficiency | 0.8 | 0.7 | 0.6 | Fraction of the food taken in that becomes energy |
 

@@ -20,7 +20,7 @@ Status of each decision: **Agreed** (you decided), **Assumed** (I chose it to ma
 | A12 | Mutation by **small random changes** to the traits. |
 | A13 | A **trade-off** option, on or off. When on, all the traits share **one maximum budget**: improving one trait must be paid for by another. |
 | A14 | The carnivore survival problem (O2) is parked for now. |
-| A15 | Starting populations are **densities** (fractions of the cells), so they follow the grid size. Defaults: plants 0.30, herbivores 0.10, carnivores 0.02. Counts are rounded to the nearest whole organism. |
+| A15 | Starting populations are **densities** (fractions of the cells), so they follow the grid size. Defaults (prompt 11): plants **0.50**, herbivores **0.20**, carnivores **0.04**, i.e. 50 / 20 / 4 per 100 cells (until then 0.30 / 0.10 / 0.02). Counts are rounded to the nearest whole organism. |
 
 ## Assumed (please review)
 
@@ -100,4 +100,4 @@ Measured with the default parameters over 10 to 20 seeds and 1,000 ticks: plants
 
 ### O4. Starting populations on the 100x50 grid: **decided** (A15)
 
-The fixed counts chosen for 10x10 (30 / 10 / 2) were very sparse on 100x50: in 3 of 3 seeds the herbivores died out before tick 100. Populations are now densities, which on 100x50 gives 1,500 / 500 / 100.
+The fixed counts chosen for 10x10 (30 / 10 / 2) were very sparse on 100x50: in 3 of 3 seeds the herbivores died out before tick 100. Populations are now densities, which with the current defaults gives 2,500 / 1,000 / 200 on 100x50.

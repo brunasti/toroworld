@@ -62,3 +62,7 @@ Set the default size of the grid to 100x50
 ### 10. 17:25
 
 2
+
+### 11. 17:30
+
+Please start with this rate as default: 50/20/4

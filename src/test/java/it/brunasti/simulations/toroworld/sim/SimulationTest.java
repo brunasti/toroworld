@@ -184,20 +184,21 @@ class SimulationTest {
     void startingPopulationFollowsTheDensitiesAndTheGridSize() {
         Census start = new Simulation(SimulationConfig.defaults()).census();
         assertEquals(0, start.tick());
-        assertEquals(1500, start.plants());
-        assertEquals(500, start.herbivores());
-        assertEquals(100, start.carnivores());
+        assertEquals(2500, start.plants());
+        assertEquals(1000, start.herbivores());
+        assertEquals(200, start.carnivores());
 
         Census small = new Simulation(SimulationConfig.defaults().withSize(10, 10)).census();
-        assertEquals(30, small.plants());
-        assertEquals(10, small.herbivores());
-        assertEquals(2, small.carnivores());
+        assertEquals(50, small.plants());
+        assertEquals(20, small.herbivores());
+        assertEquals(4, small.carnivores());
     }
 
     @Test
     void countsAreRoundedToTheNearestWholeOrganism() {
         // 7x7 = 49 cells: 30% = 14.7 -> 15, 10% = 4.9 -> 5, 2% = 0.98 -> 1
-        Census start = new Simulation(SimulationConfig.defaults().withSize(7, 7)).census();
+        Census start = new Simulation(SimulationConfig.defaults().withSize(7, 7)
+                .withDensities(0.30, 0.10, 0.02)).census();
         assertEquals(15, start.plants());
         assertEquals(5, start.herbivores());
         assertEquals(1, start.carnivores());

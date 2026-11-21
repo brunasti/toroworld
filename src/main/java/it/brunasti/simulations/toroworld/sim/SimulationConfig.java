@@ -35,7 +35,7 @@ public record SimulationConfig(
 
     /**
      * Development defaults: a 100x50 grid. Starting populations are densities, so they
-     * follow the grid size: 30% of the cells get a plant, 10% a herbivore, 2% a carnivore.
+     * follow the grid size: 50% of the cells get a plant, 20% a herbivore, 4% a carnivore.
      * The species numbers are a first guess, adjusted only on a 10x10 grid so that plants
      * and herbivores usually coexist there. They are not calibrated.
      */
@@ -43,15 +43,15 @@ public record SimulationConfig(
         return new SimulationConfig(
                 100, 50, 42L,
                 5.0, 10.0, 1.0,
-                new SpeciesConfig(0.30, 5.0,
+                new SpeciesConfig(0.50, 5.0,
                         new Genome(1.0, 3.0, 8.0, 0.4, 60),
                         new ActivityCosts(0.5, 0.0, 0.0, 0.2, 1.0),
                         0.8),
-                new SpeciesConfig(0.10, 10.0,
+                new SpeciesConfig(0.20, 10.0,
                         new Genome(1.0, 1.5, 25.0, 0.4, 80),
                         new ActivityCosts(0.4, 0.0, 0.3, 0.2, 2.0),
                         0.7),
-                new SpeciesConfig(0.02, 20.0,
+                new SpeciesConfig(0.04, 20.0,
                         new Genome(1.0, 15.0, 30.0, 0.4, 120),
                         new ActivityCosts(0.6, 0.0, 0.6, 0.3, 3.0),
                         0.6),
