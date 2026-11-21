@@ -17,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SimulationTest {
@@ -143,7 +144,7 @@ class SimulationTest {
 
     @Test
     void withMutationOnGenomesDriftAndStayWithinTheBudget() {
-        SimulationConfig config = SimulationConfig.defaults().withSize(20, 20).withPopulation(120, 40, 0);
+        SimulationConfig config = SimulationConfig.defaults().withSize(20, 20).withDensities(0.30, 0.10, 0);
         Simulation sim = new Simulation(config);
         var budget = new it.brunasti.simulations.toroworld.life.TraitBudget(java.util.Map.of(
                 Species.PLANT, config.plants().genome(),
@@ -180,12 +181,34 @@ class SimulationTest {
     }
 
     @Test
-    void startsWithTheConfiguredPopulation() {
+    void startingPopulationFollowsTheDensitiesAndTheGridSize() {
         Census start = new Simulation(SimulationConfig.defaults()).census();
         assertEquals(0, start.tick());
-        assertEquals(30, start.plants());
-        assertEquals(10, start.herbivores());
-        assertEquals(2, start.carnivores());
+        assertEquals(1500, start.plants());
+        assertEquals(500, start.herbivores());
+        assertEquals(100, start.carnivores());
+
+        Census small = new Simulation(SimulationConfig.defaults().withSize(10, 10)).census();
+        assertEquals(30, small.plants());
+        assertEquals(10, small.herbivores());
+        assertEquals(2, small.carnivores());
+    }
+
+    @Test
+    void countsAreRoundedToTheNearestWholeOrganism() {
+        // 7x7 = 49 cells: 30% = 14.7 -> 15, 10% = 4.9 -> 5, 2% = 0.98 -> 1
+        Census start = new Simulation(SimulationConfig.defaults().withSize(7, 7)).census();
+        assertEquals(15, start.plants());
+        assertEquals(5, start.herbivores());
+        assertEquals(1, start.carnivores());
+    }
+
+    @Test
+    void densitiesThatDoNotFitTheGridAreRejected() {
+        assertThrows(IllegalArgumentException.class,
+                () -> SimulationConfig.defaults().withDensities(0.3, 0.7, 0.4));
+        assertThrows(IllegalArgumentException.class,
+                () -> SimulationConfig.defaults().withDensities(1.2, 0.1, 0.0));
     }
 
     @Test

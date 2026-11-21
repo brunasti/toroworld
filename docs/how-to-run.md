@@ -76,7 +76,7 @@ Example:
 ./gradlew run --args="--width 30 --height 20 --seed 7 --trade-off off --headless --ticks 2000"
 ```
 
-> **Caveat:** the grid size does **not** change the starting population. It is still 30 plants, 10 herbivores and 2 carnivores, so a larger grid starts out sparser. To change the populations, see section 5.
+> The starting populations are **densities**, so they follow the grid size: a larger grid gets proportionally more organisms (see section 5.1).
 
 ## 5. Where the parameters are set
 
@@ -104,10 +104,10 @@ return new SimulationConfig(
 | maximum | 10.0 | Regeneration never goes above this |
 | regeneration | 1.0 | Added to every cell at the start of each tick |
 
-**Each species** is a `SpeciesConfig(initialCount, initialEnergy, genome, costs, efficiency)`:
+**Each species** is a `SpeciesConfig(initialDensity, initialEnergy, genome, costs, efficiency)`:
 
 ```java
-new SpeciesConfig(30, 5.0,                                  // initial count, initial energy
+new SpeciesConfig(0.30, 5.0,                                // initial density, initial energy
         new Genome(1.0, 3.0, 8.0, 0.4, 60),                 // starting genome
         new ActivityCosts(0.5, 0.0, 0.0, 0.2, 1.0),         // costs: live, rest, move, eat, reproduce
         0.8)                                                // efficiency
@@ -115,7 +115,7 @@ new SpeciesConfig(30, 5.0,                                  // initial count, in
 
 | Parameter | Plants | Herbivores | Carnivores | Meaning |
 |---|---|---|---|---|
-| initialCount | 30 | 10 | 2 | Organisms placed at random at tick 0 |
+| initialDensity | 0.30 | 0.10 | 0.02 | Fraction of the cells that get one organism at tick 0, placed at random. 0.10 means 10 per 100 cells. The count is rounded to the nearest whole organism: on 100x50 that is 1,500 plants, 500 herbivores and 100 carnivores. |
 | initialEnergy | 5.0 | 10.0 | 20.0 | Energy of each starting organism |
 | efficiency | 0.8 | 0.7 | 0.6 | Fraction of the food taken in that becomes energy |
 
@@ -139,7 +139,7 @@ new SpeciesConfig(30, 5.0,                                  // initial count, in
 | eat | 0.2 | 0.2 | 0.3 | Feeding |
 | reproduce | 1.0 | 2.0 | 3.0 | Producing one offspring |
 
-> The defaults are a first guess, not a calibration. They were adjusted on a 10x10 grid, where plants and herbivores usually coexist and carnivores do not survive (open question O2). On the default 100x50 grid, the same starting populations are very sparse and the herbivores die out within about 100 ticks (open question O4).
+> The defaults are a first guess, not a calibration. They were adjusted on a 10x10 grid, where plants and herbivores usually coexist and carnivores do not survive (open question O2).
 
 ### 5.2 Mutation and trade-off: `life/MutationSettings.java`, constant `DEFAULT`
 
@@ -182,7 +182,7 @@ This class holds the decision rules (reproduce → eat → move → rest), descr
 SimulationConfig config = SimulationConfig.defaults()
         .withSize(30, 30)
         .withSeed(7)
-        .withPopulation(200, 60, 8)          // plants, herbivores, carnivores
+        .withDensities(0.25, 0.08, 0.01)     // plants, herbivores, carnivores (fractions of the cells)
         .withMutation(MutationSettings.DEFAULT.withTradeOff(false));
 
 Simulation simulation = new Simulation(config);

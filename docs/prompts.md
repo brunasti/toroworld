@@ -58,3 +58,7 @@ In the bottom bar, where the current tick is displayed, please add next to it al
 ### 9. 17:22
 
 Set the default size of the grid to 100x50
+
+### 10. 17:25
+
+2

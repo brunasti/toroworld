@@ -208,11 +208,12 @@ public final class Simulation {
     // ------------------------------------------------------------- populating
 
     private void populate() {
-        for (Position p : randomCells(config.plants().initialCount())) {
+        int cells = world.torus().cellCount();
+        for (Position p : randomCells(config.plants().initialCount(cells))) {
             world.add(new Plant(nextId++, config.plants().genome(), p, config.plants().initialEnergy()));
         }
-        int herbivores = config.herbivores().initialCount();
-        List<Position> animalCells = randomCells(herbivores + config.carnivores().initialCount());
+        int herbivores = config.herbivores().initialCount(cells);
+        List<Position> animalCells = randomCells(herbivores + config.carnivores().initialCount(cells));
         for (int i = 0; i < animalCells.size(); i++) {
             SpeciesConfig sc = i < herbivores ? config.herbivores() : config.carnivores();
             Species species = i < herbivores ? Species.HERBIVORE : Species.CARNIVORE;
