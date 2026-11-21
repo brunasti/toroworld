@@ -66,3 +66,13 @@ Set the default size of the grid to 100x50
 ### 11. 17:30
 
 Please start with this rate as default: 50/20/4
+
+### 12. 17:34
+
+How fast do the erbivorous move?
+
+### 13. 17:39
+
+So I don't understand the colours in the map...
+What's the meaning of a black cell?
+Maybe we should create a general description document (and update it after any significant decision) as a docs/manual.md document

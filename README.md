@@ -30,6 +30,7 @@ In the viewer: **Start/Pause**, **Step** (one tick), **Reset**, and a speed slid
 
 ## Documentation
 
+- [docs/manual.md](docs/manual.md): what the simulation is, its rules, and how to read the map
 - [docs/decisions.md](docs/decisions.md): design decisions, assumptions to review, open questions
 - [docs/how-to-run.md](docs/how-to-run.md): how to build, run and configure the simulation
 - [docs/prompts.md](docs/prompts.md): the prompts that guided the development

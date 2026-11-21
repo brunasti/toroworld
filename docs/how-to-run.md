@@ -40,10 +40,12 @@ How the grid is drawn:
 
 | What you see | Meaning |
 |---|---|
-| Cell background, light brown → dark | Resource in the cell, full → exhausted |
+| Cell background, light brown → black | Resource in the cell, full → exhausted. A black cell is empty and has no resource left. |
 | Green square | Plant. Brighter means closer to its reproduction threshold. |
 | Blue circle | Herbivore |
 | Red circle | Carnivore |
+
+See [manual.md](manual.md), section 9, for a legend image.
 
 The status bar at the bottom shows, on the first line, the current tick and the total number of ticks of the run (e.g. `Tick 15 / 1000`), the population counts and the total resource. The second line shows the grid size, the seed and the mutation settings.
 
