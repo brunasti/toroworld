@@ -4,7 +4,7 @@ A general description of the simulation: what the world is, what lives in it, th
 
 > This manual describes the **current state** of the model. It is updated after every significant decision. For *why* things are the way they are, and for the open questions, see [decisions.md](decisions.md). For building, running and changing the parameters, see [how-to-run.md](how-to-run.md).
 >
-> Last updated: 2026-11-21 (after prompt 18).
+> Last updated: 2026-11-21 (after prompt 19).
 
 ## 1. What Toroworld is
 
@@ -123,7 +123,9 @@ The colours are:
 
 On the default 100 x 50 grid each cell is only 8 pixels wide, so a plant fills almost the whole cell and the background shows only as a thin border. Grey cells are usually cells that a plant drained before it died.
 
-**Buttons**, at the top of the window: **Start/Pause**, **Step** (one tick), **Reset**, the **Speed** slider (ticks per second), and **Manual**, which opens this manual in a separate window.
+**Buttons**, at the top of the window: **Start/Pause**, **Step** (one tick), **Reset**, the **Speed** slider (ticks per second), **Settings...**, and **Manual**, which opens this manual in a separate window.
+
+**Settings...** opens a window where you can change every parameter of the simulation: the world (size, seed, length of the run, resource), each species (starting density and energy, founder genome, activity costs, and for carnivores speed and vision), and mutation. **Save and start new run** saves them and starts a new run; they are also used at the next start of the application. The details are in [how-to-run.md](how-to-run.md), section 5.
 
 **Status bar**, at the bottom of the window:
 - line 1: current tick and total ticks of the run (e.g. `Tick 15 / 1000`, with "(end)" at the last tick), the number of plants, herbivores and carnivores, and the total resource in the world;

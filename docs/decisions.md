@@ -27,6 +27,8 @@ Status of each decision: **Agreed** (you decided), **Assumed** (I chose it to ma
 | A19 | A **fractional speed** gives a matching chance of one extra cell per tick (M4). |
 | A20 | With no prey in sight, a carnivore **wanders one cell** per tick (M6). Agreed **for now**: to be revisited. |
 | A21 | **Cell colours** (prompt 18): the background goes from light brown (full) to light grey at 15% of the maximum (1.5 of 10), then to medium grey when empty, blending linearly. Replaces the brown-to-black scale, whose dark cells distracted the eye. |
+| A22 | A **settings window** (prompt 19) edits **all** parameters, in tabs: World, Plants, Herbivores, Carnivores, Mutation. **Save and start new run** starts a new run with them and saves them to a **settings file**, loaded at every start. Command-line options override the file. |
+| A23 | The settings file is `~/.toroworld/settings.properties` (Java properties, one commented line per setting), outside the project folder so it is never committed. `--settings FILE` uses another one, `--no-settings` ignores it. An unreadable file is ignored as a whole, with a message. Plants and herbivores have no speed/vision/mobility settings (fixed at 1); plants have no move cost. |
 
 ## Assumed (please review)
 
@@ -114,7 +116,7 @@ Measured with the default parameters over 10 to 20 seeds and 1,000 ticks: plants
 
 ### O3. Others still to decide
 
-- Configuration from a file (YAML/properties) or only from code and command line?
+- ~~Configuration from a file~~: **decided** (A22, A23).
 - Statistics export (CSV) and charts of the populations over time?
 - Should dead organisms return energy to the cell's resource?
 

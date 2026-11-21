@@ -35,6 +35,7 @@ The window has these controls:
 
 A run lasts a fixed number of ticks (`--ticks`, default 1000). When the last tick is reached, the run pauses, **Start** and **Step** are disabled, and the bar shows "(end)". **Reset** starts a new run.
 | **Speed** | Ticks per second, from 1 to 50 |
+| **Settings...** | Opens the settings window (see section 5): change any parameter, then **Save and start new run** |
 | **Manual** | Opens the user manual ([manual.md](manual.md)) in a separate window. Links to the other documents open in the same window; **Manual home** goes back. |
 
 How the grid is drawn:
@@ -60,7 +61,7 @@ This prints one census line per tick. At the end it prints the mean value of eac
 
 ## 4. Command-line options
 
-You can pass these options with `--args="..."` (Gradle) or as program arguments (IntelliJ, see section 6).
+Command-line options override the settings file (section 5) for that execution only; they are not saved. You can pass them with `--args="..."` (Gradle) or as program arguments (IntelliJ, see section 6).
 
 | Option | Default | Meaning |
 |---|---|---|
@@ -72,7 +73,9 @@ You can pass these options with `--args="..."` (Gradle) or as program arguments 
 | `--carnivore-max-speed N` | 3 | Highest speed carnivores can evolve, in cells per tick (at least 1) |
 | `--headless` | (viewer) | Run without a window, printing the census |
 | `--ticks N` | 1000 | Length of the run, in ticks. The viewer pauses at the last tick. |
-| `--help` | | Print the usage |
+| `--settings FILE` | `~/.toroworld/settings.properties` | Use another settings file |
+| `--no-settings` | | Ignore the settings file: start from the built-in defaults |
+| `--help` | | Print the usage and the path of the settings file |
 
 Example:
 
@@ -84,9 +87,37 @@ Example:
 
 ## 5. Where the parameters are set
 
-There is no configuration file yet (see open question O3 in [decisions.md](decisions.md)). Every parameter that is not on the command line is set **in code**, in the files below. Change the value, then rebuild and run.
+A run takes its parameters from three places. Each one overrides the one before:
 
-All paths below are relative to `src/main/java/it/brunasti/simulations/toroworld/`.
+1. **Built-in defaults**, in code (sections 5.1 to 5.3). They are used when nothing else is set.
+2. **The settings file**, `~/.toroworld/settings.properties` (on a Mac: `/Users/<you>/.toroworld/settings.properties`). It is loaded at every start, by the viewer and in headless mode.
+3. **Command-line options** (section 4), for that execution only.
+
+### The settings window
+
+In the viewer, **Settings...** opens a window with one tab per group: **World**, **Plants**, **Herbivores**, **Carnivores**, **Mutation**. Every parameter described below is there, with a one-line explanation next to it.
+
+- **Save and start new run** checks the values, saves them to the settings file, and starts a new run with them. If a value is invalid (e.g. a density above 1, or a carnivore speed above its maximum), a message names the setting and the window stays open.
+- **Restore defaults** fills in the built-in defaults. Nothing changes until you save.
+- **Cancel** closes the window; the current run continues.
+
+Plants and herbivores have no speed, vision or mobility settings, because they always move one cell (herbivores) and see only their neighbours. Plants have no move cost.
+
+### The settings file
+
+A plain text file, one `key=value` line per parameter, with a comment explaining each one. The settings window writes it, and you can also edit it by hand: keys that are missing keep their default, and unknown keys are ignored. If a value cannot be read, the whole file is ignored and a message says why. Delete the file to go back to the built-in defaults.
+
+```properties
+# Width: Grid width, in cells
+world.width=100
+...
+# Maximum speed: Highest speed the species can evolve (the lowest is 1)
+carnivores.mobility.maxSpeed=3.0
+```
+
+### The built-in defaults, in code
+
+To change a default for everyone (rather than in your own settings file), edit the code in the files below, then rebuild. All paths are relative to `src/main/java/it/brunasti/simulations/toroworld/`. The settings window and file use the same names.
 
 ### 5.1 World and species: `sim/SimulationConfig.java`, method `defaults()`
 

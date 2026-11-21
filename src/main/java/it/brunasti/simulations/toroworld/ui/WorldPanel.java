@@ -36,8 +36,13 @@ public final class WorldPanel extends JPanel {
     public WorldPanel(Simulation simulation) {
         this.simulation = simulation;
         setBackground(Color.BLACK);
+        fitToWorld();
+    }
+
+    /** Sets the preferred size from the grid size: square cells, at most about 800 pixels wide. */
+    public void fitToWorld() {
         Torus t = simulation.world().torus();
-        int cell = Math.max(8, Math.min(60, 600 / Math.max(t.width(), t.height())));
+        int cell = Math.max(2, Math.min(60, 800 / Math.max(t.width(), t.height())));
         setPreferredSize(new Dimension(t.width() * cell, t.height() * cell));
     }
 
