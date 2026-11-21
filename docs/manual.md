@@ -4,7 +4,7 @@ A general description of the simulation: what the world is, what lives in it, th
 
 > This manual describes the **current state** of the model. It is updated after every significant decision. For *why* things are the way they are, and for the open questions, see [decisions.md](decisions.md). For building, running and changing the parameters, see [how-to-run.md](how-to-run.md).
 >
-> Last updated: 2026-11-21 (after prompt 19).
+> Last updated: 2026-11-21 (after prompt 20).
 
 ## 1. What Toroworld is
 
@@ -128,8 +128,9 @@ On the default 100 x 50 grid each cell is only 8 pixels wide, so a plant fills a
 **Settings...** opens a window where you can change every parameter of the simulation: the world (size, seed, length of the run, resource), each species (starting density and energy, founder genome, activity costs, and for carnivores speed and vision), and mutation. **Save and start new run** saves them and starts a new run; they are also used at the next start of the application. The details are in [how-to-run.md](how-to-run.md), section 5.
 
 **Status bar**, at the bottom of the window:
-- line 1: current tick and total ticks of the run (e.g. `Tick 15 / 1000`, with "(end)" at the last tick), the number of plants, herbivores and carnivores, and the total resource in the world;
-- line 2: grid size, random seed, and whether mutation and the trade-off are on.
+- line 1: current tick and total ticks of the run (e.g. `Tick 15 / 1000`, with "(end)" at the last tick), and the number of plants, herbivores and carnivores;
+- line 2: where the energy is. **Resource in cells** is the total resource left in all the cells, not yet taken by plants. **Energy in plants / herbivores / carnivores** is the total energy held by the living organisms of each species. Together they show how energy flows up the food chain: from the cells to the plants, to the herbivores, to the carnivores;
+- line 3: grid size, random seed, and whether mutation and the trade-off are on.
 
 ## 10. What to expect from the current defaults
 

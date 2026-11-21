@@ -86,9 +86,13 @@ public final class Simulation {
         int plants = 0;
         int herbivores = 0;
         int carnivores = 0;
+        double plantEnergy = 0;
+        double herbivoreEnergy = 0;
+        double carnivoreEnergy = 0;
         for (Plant p : world.plants()) {
             if (p.isAlive()) {
                 plants++;
+                plantEnergy += p.energy();
             }
         }
         for (Animal a : world.animals()) {
@@ -97,11 +101,14 @@ public final class Simulation {
             }
             if (a.species() == Species.HERBIVORE) {
                 herbivores++;
+                herbivoreEnergy += a.energy();
             } else {
                 carnivores++;
+                carnivoreEnergy += a.energy();
             }
         }
-        return new Census(tick, plants, herbivores, carnivores, world.resources().total());
+        return new Census(tick, plants, herbivores, carnivores, world.resources().total(),
+                plantEnergy, herbivoreEnergy, carnivoreEnergy);
     }
 
     /**

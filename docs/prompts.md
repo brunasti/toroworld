@@ -103,3 +103,7 @@ The dark brown and the black are too in contrast with the rest and distract the 
 ### 19. 18:24
 
 Can you create a popup window where I can set the specific parameters for the next execution?
+
+### 20. 18:57
+
+In the resource display, could you add a breakdown per type of entity? How much in vegetables, erbivore and carnivore

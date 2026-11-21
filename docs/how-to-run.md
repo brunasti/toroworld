@@ -49,7 +49,7 @@ How the grid is drawn:
 
 See [manual.md](manual.md), section 9, for a legend image.
 
-The status bar at the bottom shows, on the first line, the current tick and the total number of ticks of the run (e.g. `Tick 15 / 1000`), the population counts and the total resource. The second line shows the grid size, the seed and the mutation settings.
+The status bar at the bottom has three lines: the current tick and the total number of ticks of the run (e.g. `Tick 15 / 1000`) with the population counts; the resource left in the cells and the total energy held by plants, herbivores and carnivores; and the grid size, the seed and the mutation settings.
 
 ### Headless (no window)
 
@@ -57,7 +57,7 @@ The status bar at the bottom shows, on the first line, the current tick and the 
 ./gradlew run --args="--headless --ticks 500"
 ```
 
-This prints one census line per tick. At the end it prints the mean value of each trait for every species still alive, which is how you can see evolution happening. The run stops early if all life ends.
+This prints one census line per tick: the population counts, the resource left in the cells, and the total energy held by each species. At the end it prints the mean value of each trait for every species still alive, which is how you can see evolution happening. The run stops early if all life ends.
 
 ## 4. Command-line options
 

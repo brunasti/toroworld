@@ -151,12 +151,15 @@ public final class ToroworldFrame extends JFrame {
     private void updateStatus() {
         var c = simulation.census();
         SimulationConfig config = settings.config();
-        // Two lines, so the bar fits the width of a small grid.
+        // Three short lines, so the bar fits the width of a small grid.
         status.setText(String.format(
                 "<html>Tick %d / %d%s &nbsp;|&nbsp; Plants %d &nbsp; Herbivores %d &nbsp; Carnivores %d"
-                        + " &nbsp;|&nbsp; Resource %.0f<br>%dx%d, seed %d, %s</html>",
+                        + "<br>Resource in cells %.0f &nbsp;|&nbsp; Energy in plants %.0f"
+                        + " &nbsp; herbivores %.0f &nbsp; carnivores %.0f"
+                        + "<br>%dx%d, seed %d, %s</html>",
                 c.tick(), settings.ticks(), finished() ? " (end)" : "",
-                c.plants(), c.herbivores(), c.carnivores(), c.resource(),
+                c.plants(), c.herbivores(), c.carnivores(),
+                c.resource(), c.plantEnergy(), c.herbivoreEnergy(), c.carnivoreEnergy(),
                 config.width(), config.height(), config.seed(), mutationLabel()));
         runButton.setEnabled(!finished());
         stepButton.setEnabled(!finished());

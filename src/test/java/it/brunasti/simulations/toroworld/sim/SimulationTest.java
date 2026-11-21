@@ -220,6 +220,24 @@ class SimulationTest {
     }
 
     @Test
+    void censusReportsTheEnergyOfEachSpecies() {
+        SimulationConfig config = emptyWorld(species(genome(0), FREE, 1), species(genome(1), FREE, 1),
+                species(genome(1), FREE, 1));
+        Simulation sim = new Simulation(config);
+        sim.world().add(new Plant(1, config.plants().genome(), CORNER, 2.5));
+        sim.world().add(new Plant(2, config.plants().genome(), CENTRE, 4));
+        sim.world().add(new Animal(3, Species.HERBIVORE, config.herbivores().genome(), CORNER, 7));
+        sim.world().add(new Animal(4, Species.CARNIVORE, config.carnivores().genome(), CENTRE, 11));
+
+        Census census = sim.census();
+
+        assertEquals(6.5, census.plantEnergy(), EPS);
+        assertEquals(7.0, census.herbivoreEnergy(), EPS);
+        assertEquals(11.0, census.carnivoreEnergy(), EPS);
+        assertEquals(45.0, census.resource(), EPS);
+    }
+
+    @Test
     void sameSeedGivesTheSameRun() {
         assertEquals(run(SimulationConfig.defaults(), 200), run(SimulationConfig.defaults(), 200));
     }
