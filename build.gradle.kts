@@ -2,7 +2,7 @@ plugins {
     application
 }
 
-group = "io.github.brunasti"
+group = "it.brunasti.simulations"
 version = "0.1.0-SNAPSHOT"
 
 // Java release to compile for. Defaults to 25 (the project JDK).
@@ -26,7 +26,7 @@ tasks.withType<JavaCompile>().configureEach {
 }
 
 application {
-    mainClass = "io.github.brunasti.toroworld.Toroworld"
+    mainClass = "it.brunasti.simulations.toroworld.Toroworld"
 }
 
 tasks.test {

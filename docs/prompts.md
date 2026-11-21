@@ -33,3 +33,12 @@ And a git repo: https://github.com/brunasti/toroworld.git
 ### 4. 16:41
 
 Please save in a "docs/prompts.md" document all the prompts I gave
+
+### 5. 16:59
+
+OK, as a first starting point it's OK.
+1 - this is a complext thing we should think about. Could we create an option to set on or off the trade-off, and if it's on then we have a max value for all the traits value? And yes, let's make the small random changes.
+2 - Don't worry about the carnivore problem for now.
+3 - the package should be: it/brunasti.symulations.toroworld
+
+* for the BRIEF.md, ok to add it to the .gitignore
