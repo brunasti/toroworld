@@ -14,22 +14,32 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.io.Serial;
 
-/** Main window: the world view plus run controls and the current census. */
+/**
+ * Main window: the world view plus run controls and the current census.
+ * A run lasts a fixed number of ticks; when it is reached the run pauses,
+ * and only Reset starts again.
+ */
 public final class ToroworldFrame extends JFrame {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     private final transient SimulationConfig config;
+    private final long totalTicks;
     private transient Simulation simulation;
     private final WorldPanel worldPanel;
     private final JLabel status = new JLabel();
     private final JButton runButton = new JButton("Start");
+    private final JButton stepButton = new JButton("Step");
     private final Timer timer;
 
-    public ToroworldFrame(SimulationConfig config) {
+    public ToroworldFrame(SimulationConfig config, long totalTicks) {
         super("Toroworld");
+        if (totalTicks < 1) {
+            throw new IllegalArgumentException("totalTicks must be >= 1");
+        }
         this.config = config;
+        this.totalTicks = totalTicks;
         this.simulation = new Simulation(config);
         this.worldPanel = new WorldPanel(simulation);
 
@@ -38,7 +48,6 @@ public final class ToroworldFrame extends JFrame {
         timer = new Timer(1000 / speed.getValue(), e -> step());
         speed.addChangeListener(e -> timer.setDelay(1000 / speed.getValue()));
 
-        JButton stepButton = new JButton("Step");
         JButton resetButton = new JButton("Reset");
         runButton.addActionListener(e -> toggleRun());
         stepButton.addActionListener(e -> step());
@@ -75,8 +84,15 @@ public final class ToroworldFrame extends JFrame {
     }
 
     private void step() {
+        if (finished()) {
+            return;
+        }
         simulation.step();
         worldPanel.repaint();
+        if (finished()) {
+            timer.stop();
+            runButton.setText("Start");
+        }
         updateStatus();
     }
 
@@ -86,12 +102,21 @@ public final class ToroworldFrame extends JFrame {
         updateStatus();
     }
 
+    private boolean finished() {
+        return simulation.tick() >= totalTicks;
+    }
+
     private void updateStatus() {
         var c = simulation.census();
+        // Two lines, so the bar fits the width of a small grid.
         status.setText(String.format(
-                "Tick %d   |   Plants %d   Herbivores %d   Carnivores %d   |   Resource %.0f   |   %dx%d, seed %d, %s",
-                c.tick(), c.plants(), c.herbivores(), c.carnivores(), c.resource(),
+                "<html>Tick %d / %d%s &nbsp;|&nbsp; Plants %d &nbsp; Herbivores %d &nbsp; Carnivores %d"
+                        + " &nbsp;|&nbsp; Resource %.0f<br>%dx%d, seed %d, %s</html>",
+                c.tick(), totalTicks, finished() ? " (end)" : "",
+                c.plants(), c.herbivores(), c.carnivores(), c.resource(),
                 config.width(), config.height(), config.seed(), mutationLabel()));
+        runButton.setEnabled(!finished());
+        stepButton.setEnabled(!finished());
     }
 
     private String mutationLabel() {

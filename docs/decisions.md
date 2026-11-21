@@ -74,6 +74,7 @@ Status of each decision: **Agreed** (you decided), **Assumed** (I chose it to ma
 | T2 | Decision rules, by priority: reproduce → eat → move (herbivores prefer the neighbouring cell with the richest plant; otherwise a random free cell) → rest. | Genome-driven or learned behaviour. |
 | T3 | Deciding (`Behaviour`) is separate from executing (`Simulation`), so rules can change without touching the energy bookkeeping. | |
 | T4 | Tick order: resource regenerates → all plants act (random order) → all animals act (random order) → dead removed. | All organisms in one random order; simultaneous update (everyone decides on the same snapshot, then conflicts are resolved). |
+| T5 | A run has a fixed length (`--ticks`, default **1000**, the same in the viewer and headless). The viewer shows `Tick n / total` and pauses at the end. Before this, the viewer ran without limit and headless defaulted to 100 ticks. | Viewer without limit unless `--ticks` is given. |
 
 ## Open
 

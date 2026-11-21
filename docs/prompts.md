@@ -50,3 +50,7 @@ Yes, please push it, but with which branch name and commit title?
 ### 7. 17:15
 
 Could you create a document docs/how-to-run.md describing how to configure and run the simulation, as for example where to set the different parameterds?
+
+### 8. 17:19
+
+In the bottom bar, where the current tick is displayed, please add next to it also the total number of ticks

@@ -32,6 +32,8 @@ The window has these controls:
 | **Start / Pause** | Runs the simulation continuously, or stops it |
 | **Step** | Advances exactly one tick |
 | **Reset** | Restarts from tick 0 with the same configuration and seed |
+
+A run lasts a fixed number of ticks (`--ticks`, default 1000). When the last tick is reached, the run pauses, **Start** and **Step** are disabled, and the bar shows "(end)". **Reset** starts a new run.
 | **Speed** | Ticks per second, from 1 to 50 |
 
 How the grid is drawn:
@@ -43,7 +45,7 @@ How the grid is drawn:
 | Blue circle | Herbivore |
 | Red circle | Carnivore |
 
-The status bar at the bottom shows the tick, the population counts, the total resource, the grid size, the seed and the mutation settings.
+The status bar at the bottom shows, on the first line, the current tick and the total number of ticks of the run (e.g. `Tick 15 / 1000`), the population counts and the total resource. The second line shows the grid size, the seed and the mutation settings.
 
 ### Headless (no window)
 
@@ -65,7 +67,7 @@ You can pass these options with `--args="..."` (Gradle) or as program arguments 
 | `--mutation on\|off` | on | `off`: offspring are exact copies of their parent |
 | `--trade-off on\|off` | on | `off`: mutation without the trait budget |
 | `--headless` | (viewer) | Run without a window, printing the census |
-| `--ticks N` | 100 | Number of ticks to run (headless only) |
+| `--ticks N` | 1000 | Length of the run, in ticks. The viewer pauses at the last tick. |
 | `--help` | | Print the usage |
 
 Example:

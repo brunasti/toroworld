@@ -16,11 +16,15 @@ import java.util.Map;
  *   toroworld [--width N] [--height N] [--seed N] [--mutation on|off] [--trade-off on|off]
  *             [--headless] [--ticks N]
  * </pre>
- * Without {@code --headless} the Swing viewer opens. With it, the simulation runs
- * for {@code --ticks} ticks (default 100), prints one census line per tick and,
- * at the end, the mean traits of each surviving species.
+ * A run lasts {@code --ticks} ticks (default {@value #DEFAULT_TICKS}).
+ * Without {@code --headless} the Swing viewer opens and pauses at the last tick.
+ * With it, the simulation prints one census line per tick and, at the end,
+ * the mean traits of each surviving species.
  */
 public final class Toroworld {
+
+    /** Length of a run, in ticks, when {@code --ticks} is not given. */
+    public static final int DEFAULT_TICKS = 1000;
 
     private Toroworld() {
     }
@@ -28,7 +32,7 @@ public final class Toroworld {
     public static void main(String[] args) {
         SimulationConfig config = SimulationConfig.defaults();
         boolean headless = false;
-        int ticks = 100;
+        int ticks = DEFAULT_TICKS;
 
         for (int i = 0; i < args.length; i++) {
             switch (args[i]) {
@@ -50,11 +54,15 @@ public final class Toroworld {
             }
         }
 
+        if (ticks < 1) {
+            throw new IllegalArgumentException("--ticks must be at least 1");
+        }
         if (headless) {
             runHeadless(config, ticks);
         } else {
             SimulationConfig finalConfig = config;
-            SwingUtilities.invokeLater(() -> new ToroworldFrame(finalConfig).setVisible(true));
+            int finalTicks = ticks;
+            SwingUtilities.invokeLater(() -> new ToroworldFrame(finalConfig, finalTicks).setVisible(true));
         }
     }
 
