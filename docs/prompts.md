@@ -42,3 +42,7 @@ OK, as a first starting point it's OK.
 3 - the package should be: it/brunasti.symulations.toroworld
 
 * for the BRIEF.md, ok to add it to the .gitignore
+
+### 6. 17:07
+
+Yes, please push it, but with which branch name and commit title?
