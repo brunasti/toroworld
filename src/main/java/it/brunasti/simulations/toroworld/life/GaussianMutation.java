@@ -1,5 +1,7 @@
 package it.brunasti.simulations.toroworld.life;
 
+import java.util.EnumMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.random.RandomGenerator;
 
@@ -9,6 +11,8 @@ import java.util.random.RandomGenerator;
  * <pre>
  *   newValue = clamp(value * (1 + N(0, relativeSigma)))
  * </pre>
+ * The range used for clamping is the species' own range when one is given
+ * (e.g. speed between 1 and the species' maximum speed), otherwise the trait's default range.
  * When a {@link TraitBudget} is given (trade-off on) and the changed genome would
  * exceed it, the mutation is rejected and the offspring gets the parent genome.
  */
@@ -17,8 +21,14 @@ public final class GaussianMutation implements Mutation {
     private final double probability;
     private final double relativeSigma;
     private final TraitBudget budget;
+    private final Map<Species, Map<Trait, TraitRange>> ranges;
 
     public GaussianMutation(double probability, double relativeSigma, TraitBudget budget) {
+        this(probability, relativeSigma, budget, Map.of());
+    }
+
+    public GaussianMutation(double probability, double relativeSigma, TraitBudget budget,
+                            Map<Species, Map<Trait, TraitRange>> ranges) {
         if (probability < 0 || probability > 1) {
             throw new IllegalArgumentException("probability must be in [0, 1]");
         }
@@ -28,6 +38,15 @@ public final class GaussianMutation implements Mutation {
         this.probability = probability;
         this.relativeSigma = relativeSigma;
         this.budget = budget;
+        Map<Species, Map<Trait, TraitRange>> copy = new EnumMap<>(Species.class);
+        ranges.forEach((species, map) -> copy.put(species, Map.copyOf(map)));
+        this.ranges = copy;
+    }
+
+    /** The range a trait is clamped to for a species. */
+    public TraitRange range(Species species, Trait trait) {
+        TraitRange specific = ranges.getOrDefault(species, Map.of()).get(trait);
+        return specific != null ? specific : trait.range();
     }
 
     public Optional<TraitBudget> budget() {
@@ -43,7 +62,7 @@ public final class GaussianMutation implements Mutation {
             boolean mutates = random.nextDouble() < probability;
             double noise = random.nextGaussian() * relativeSigma;
             if (mutates) {
-                child = child.with(trait, trait.clamp(child.get(trait) * (1 + noise)));
+                child = child.with(trait, range(species, trait).clamp(child.get(trait) * (1 + noise)));
                 changed = true;
             }
         }

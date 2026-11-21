@@ -70,6 +70,27 @@ public final class Torus {
         return new ArrayList<>(result);
     }
 
+    /**
+     * The distinct cells at distance 1 to {@code radius} from {@code p} (a square around it,
+     * wrapping across the edges), excluding {@code p} itself. They are listed row by row, not by
+     * distance: callers that need the nearest cell must compare distances.
+     */
+    public List<Position> cellsWithin(Position p, int radius) {
+        if (radius < 1) {
+            return List.of();
+        }
+        Set<Position> result = new LinkedHashSet<>();
+        for (int dy = -radius; dy <= radius; dy++) {
+            for (int dx = -radius; dx <= radius; dx++) {
+                Position n = wrap(p.x() + dx, p.y() + dy);
+                if (!n.equals(p)) {
+                    result.add(n);
+                }
+            }
+        }
+        return new ArrayList<>(result);
+    }
+
     /** Shortest signed offset from a to b along one axis of the given size. */
     static int shortestDelta(int a, int b, int size) {
         int d = Math.floorMod(b - a, size);

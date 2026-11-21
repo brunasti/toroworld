@@ -15,6 +15,7 @@ Requires JDK 25 (or any JDK from 21 with `-PjavaRelease=21`).
 ./gradlew run --args="--headless --ticks 500"   # print one census line per tick, then the mean traits
 ./gradlew run --args="--mutation off"           # offspring are exact copies
 ./gradlew run --args="--trade-off off"          # mutation without the trait budget
+./gradlew run --args="--carnivore-max-speed 5"  # carnivores can evolve up to 5 cells per tick
 ```
 
 In the viewer: **Start/Pause**, **Step** (one tick), **Reset**, a speed slider (ticks per second), and **Manual**, which opens the user manual. The cell background shows the resource (darker means more depleted). Plants are green squares, herbivores are blue circles, carnivores are red circles.

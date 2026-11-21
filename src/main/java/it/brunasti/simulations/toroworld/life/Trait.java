@@ -15,7 +15,17 @@ public enum Trait {
     /** Share of energy given to the offspring. A strategy, not an advantage: outside the budget. */
     OFFSPRING_SHARE(0.05, 0.95, Direction.STRATEGY),
     /** Maximum age in ticks. Higher is an advantage. */
-    MAX_AGE(1.0, 100_000.0, Direction.HIGHER_IS_BETTER);
+    MAX_AGE(1.0, 100_000.0, Direction.HIGHER_IS_BETTER),
+    /**
+     * Cells an animal can travel in one tick. Higher is an advantage. The upper limit
+     * actually used is set per species ({@code Mobility.maxSpeed}).
+     */
+    SPEED(1.0, 100.0, Direction.HIGHER_IS_BETTER),
+    /**
+     * Sight distance as a multiple of a base speed (see {@code Mobility.visionBase}).
+     * Higher is an advantage. The range actually used is set per species.
+     */
+    VISION(1.0, 100.0, Direction.HIGHER_IS_BETTER);
 
     /** How a change of the trait counts against the trade-off budget. */
     public enum Direction {
@@ -49,5 +59,10 @@ public enum Trait {
 
     public double clamp(double value) {
         return Math.max(minimum, Math.min(maximum, value));
+    }
+
+    /** The default range of this trait, used when a species sets no narrower one. */
+    public TraitRange range() {
+        return new TraitRange(minimum, maximum);
     }
 }

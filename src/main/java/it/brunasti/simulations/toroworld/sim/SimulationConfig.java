@@ -38,6 +38,8 @@ public record SimulationConfig(
      * follow the grid size: 50% of the cells get a plant, 20% a herbivore, 4% a carnivore.
      * The species numbers are a first guess, adjusted only on a 10x10 grid so that plants
      * and herbivores usually coexist there. They are not calibrated.
+     * Carnivores start at speed 1 and vision 1.5, and can evolve speed up to 3 and vision up to 3
+     * (sight = vision x own speed). Plants and herbivores have speed 1 and see only their neighbours.
      */
     public static SimulationConfig defaults() {
         return new SimulationConfig(
@@ -52,9 +54,10 @@ public record SimulationConfig(
                         new ActivityCosts(0.4, 0.0, 0.3, 0.2, 2.0),
                         0.7),
                 new SpeciesConfig(0.04, 20.0,
-                        new Genome(1.0, 15.0, 30.0, 0.4, 120),
+                        new Genome(1.0, 15.0, 30.0, 0.4, 120, 1.0, 1.5),
                         new ActivityCosts(0.6, 0.0, 0.6, 0.3, 3.0),
-                        0.6),
+                        0.6,
+                        new Mobility(3.0, 1.5, 3.0, Mobility.VisionBase.OWN_SPEED)),
                 MutationSettings.DEFAULT);
     }
 
@@ -75,6 +78,11 @@ public record SimulationConfig(
                 resourceRegeneration, plants.withInitialDensity(plantDensity),
                 herbivores.withInitialDensity(herbivoreDensity),
                 carnivores.withInitialDensity(carnivoreDensity), mutation);
+    }
+
+    public SimulationConfig withCarnivores(SpeciesConfig newCarnivores) {
+        return new SimulationConfig(width, height, seed, resourceInitial, resourceMaximum,
+                resourceRegeneration, plants, herbivores, newCarnivores, mutation);
     }
 
     public SimulationConfig withMutation(MutationSettings newMutation) {

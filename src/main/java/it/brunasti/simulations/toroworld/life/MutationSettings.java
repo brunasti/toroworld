@@ -39,10 +39,18 @@ public record MutationSettings(boolean enabled, double probability, double relat
 
     /** Builds the mutation, using the starting genome of each species as its founder. */
     public Mutation create(Map<Species, Genome> founders) {
+        return create(founders, Map.of());
+    }
+
+    /**
+     * Builds the mutation, using the starting genome of each species as its founder
+     * and the given per-species trait ranges for clamping.
+     */
+    public Mutation create(Map<Species, Genome> founders, Map<Species, Map<Trait, TraitRange>> ranges) {
         if (!enabled) {
             return Mutation.NONE;
         }
         TraitBudget budget = tradeOff ? new TraitBudget(founders, allowance) : null;
-        return new GaussianMutation(probability, relativeSigma, budget);
+        return new GaussianMutation(probability, relativeSigma, budget, ranges);
     }
 }

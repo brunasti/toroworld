@@ -49,6 +49,13 @@ class TorusTest {
     }
 
     @Test
+    void cellsWithinARadiusFormASquareWithoutTheCentre() {
+        assertEquals(24, torus.cellsWithin(new Position(0, 0), 2).size());
+        assertTrue(torus.cellsWithin(new Position(0, 0), 2).contains(new Position(8, 8)));
+        assertEquals(24, new Torus(5, 5).cellsWithin(new Position(2, 2), 7).size());
+    }
+
+    @Test
     void rejectsEmptyGrid() {
         assertThrows(IllegalArgumentException.class, () -> new Torus(0, 5));
     }

@@ -9,6 +9,7 @@ import it.brunasti.simulations.toroworld.life.Organism;
 import it.brunasti.simulations.toroworld.life.Plant;
 import it.brunasti.simulations.toroworld.life.Species;
 import it.brunasti.simulations.toroworld.life.Trait;
+import it.brunasti.simulations.toroworld.life.TraitRange;
 import it.brunasti.simulations.toroworld.world.Position;
 import it.brunasti.simulations.toroworld.world.ResourceField;
 import it.brunasti.simulations.toroworld.world.Torus;
@@ -48,10 +49,13 @@ public final class Simulation {
     }
 
     public Simulation(SimulationConfig config, Behaviour behaviour) {
-        this(config, behaviour, config.mutation().create(Map.of(
-                Species.PLANT, config.plants().genome(),
-                Species.HERBIVORE, config.herbivores().genome(),
-                Species.CARNIVORE, config.carnivores().genome())));
+        this(config, behaviour, config.mutation().create(
+                Map.of(Species.PLANT, config.plants().genome(),
+                        Species.HERBIVORE, config.herbivores().genome(),
+                        Species.CARNIVORE, config.carnivores().genome()),
+                Map.of(Species.PLANT, ranges(config.plants()),
+                        Species.HERBIVORE, ranges(config.herbivores()),
+                        Species.CARNIVORE, ranges(config.carnivores()))));
     }
 
     /** For experiments and tests: uses the given mutation instead of the configured one. */
@@ -144,24 +148,48 @@ public final class Simulation {
 
     // ---------------------------------------------------------------- acting
 
+    private static Map<Trait, TraitRange> ranges(SpeciesConfig species) {
+        return Map.of(Trait.SPEED, species.mobility().speedRange(),
+                Trait.VISION, species.mobility().visionRange());
+    }
+
     private void act(Organism self) {
         SpeciesConfig species = speciesConfig(self.species());
         ActivityCosts costs = species.costs();
-        Intent intent = behaviour.decide(self, world, costs, random);
+        Intent intent = behaviour.decide(self, world, species, random);
 
+        int cellsMoved = intent.route().isEmpty() ? 0 : walk((Animal) self, intent.route());
         double handedOver = 0;
         switch (intent.activity()) {
-            case REST -> { }
-            case MOVE -> world.move((Animal) self, intent.target());
+            case REST, MOVE -> { }
             case EAT -> eat(self, intent.target(), species);
             case REPRODUCE -> handedOver = reproduce(self, intent.target(), costs);
             case LIVE -> throw new IllegalStateException("LIVE cannot be chosen");
         }
 
-        self.spend(self.costOf(intent.activity(), costs) + self.costOf(Activity.LIVE, costs) + handedOver);
+        // Moving costs the move cost for every cell travelled; a move has no other activity cost.
+        double activityCost = intent.activity() == Activity.MOVE ? 0 : self.costOf(intent.activity(), costs);
+        double movingCost = cellsMoved * self.costOf(Activity.MOVE, costs);
+        self.spend(activityCost + movingCost + self.costOf(Activity.LIVE, costs) + handedOver);
         if (self.isAlive()) {
             self.growOlder();
         }
+    }
+
+    /**
+     * Walks the animal along the route, one neighbouring cell at a time, and returns the number of
+     * cells actually travelled. Stops early if a step is not to a free neighbouring cell.
+     */
+    private int walk(Animal animal, List<Position> route) {
+        int moved = 0;
+        for (Position next : route) {
+            if (world.torus().distance(animal.position(), next) != 1 || world.hasAnimal(next)) {
+                break;
+            }
+            world.move(animal, next);
+            moved++;
+        }
+        return moved;
     }
 
     private void eat(Organism self, Position target, SpeciesConfig species) {
@@ -177,6 +205,7 @@ public final class Simulation {
                     .orElse(0.0);
             case CARNIVORE -> world.animalAt(target)
                     .filter(prey -> ((Animal) self).eats(prey))
+                    .filter(prey -> world.torus().distance(self.position(), target) <= 1)
                     .map(prey -> {
                         double meal = Math.min(intake, prey.energy());
                         prey.die();

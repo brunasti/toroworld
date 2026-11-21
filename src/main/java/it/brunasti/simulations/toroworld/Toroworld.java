@@ -5,6 +5,7 @@ import it.brunasti.simulations.toroworld.life.Trait;
 import it.brunasti.simulations.toroworld.sim.Census;
 import it.brunasti.simulations.toroworld.sim.Simulation;
 import it.brunasti.simulations.toroworld.sim.SimulationConfig;
+import it.brunasti.simulations.toroworld.sim.SpeciesConfig;
 import it.brunasti.simulations.toroworld.ui.ToroworldFrame;
 
 import javax.swing.SwingUtilities;
@@ -14,7 +15,7 @@ import java.util.Map;
  * Entry point.
  * <pre>
  *   toroworld [--width N] [--height N] [--seed N] [--mutation on|off] [--trade-off on|off]
- *             [--headless] [--ticks N]
+ *             [--carnivore-max-speed N] [--headless] [--ticks N]
  * </pre>
  * A run lasts {@code --ticks} ticks (default {@value #DEFAULT_TICKS}).
  * Without {@code --headless} the Swing viewer opens and pauses at the last tick.
@@ -43,11 +44,17 @@ public final class Toroworld {
                         config.mutation().withEnabled(onOff(args, ++i)));
                 case "--trade-off" -> config = config.withMutation(
                         config.mutation().withTradeOff(onOff(args, ++i)));
+                case "--carnivore-max-speed" -> {
+                    SpeciesConfig carnivores = config.carnivores();
+                    config = config.withCarnivores(carnivores.withMobility(
+                            carnivores.mobility().withMaxSpeed(Double.parseDouble(arg(args, ++i)))));
+                }
                 case "--ticks" -> ticks = intArg(args, ++i);
                 case "--headless" -> headless = true;
                 case "--help", "-h" -> {
                     System.out.println("Usage: toroworld [--width N] [--height N] [--seed N]"
-                            + " [--mutation on|off] [--trade-off on|off] [--headless] [--ticks N]");
+                            + " [--mutation on|off] [--trade-off on|off] [--carnivore-max-speed N]"
+                            + " [--headless] [--ticks N]");
                     return;
                 }
                 default -> throw new IllegalArgumentException("Unknown option: " + args[i]);

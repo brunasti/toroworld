@@ -80,3 +80,11 @@ Maybe we should create a general description document (and update it after any s
 ### 14. 17:44
 
 OK, let's add a button in the UI which open in a preview window this manual, so that when executing the application a user can read it
+
+### 15. 17:54
+
+OK, the manual works perfectly.
+
+### 16. 17:57
+
+Now let's set the carnivore sped as an evolutionary trait, which can variate between a min (1) and a max (set as a config parameter for the given simulation, let's say by default 3). This means also that the carnivore should be able to see at a distance that is at least 1.5 of their max speed (again an evolutionary trait, from a min of 1.5 to a max of 3).

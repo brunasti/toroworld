@@ -4,7 +4,7 @@ A general description of the simulation: what the world is, what lives in it, th
 
 > This manual describes the **current state** of the model. It is updated after every significant decision. For *why* things are the way they are, and for the open questions, see [decisions.md](decisions.md). For building, running and changing the parameters, see [how-to-run.md](how-to-run.md).
 >
-> Last updated: 2026-11-21 (after prompt 14).
+> Last updated: 2026-11-21 (after prompt 16).
 
 ## 1. What Toroworld is
 
@@ -41,7 +41,7 @@ Energy is the currency of life. Every organism has an energy level.
 |---|---|---|---|
 | Live (every tick) | 0.5 | 0.4 | 0.6 |
 | Rest | 0 | 0 | 0 |
-| Move one cell | (never moves) | 0.3 | 0.6 |
+| Move, **per cell travelled** | (never moves) | 0.3 | 0.6 |
 | Eat | 0.2 | 0.2 | 0.3 |
 | Reproduce | 1.0 | 2.0 | 3.0 |
 
@@ -61,11 +61,23 @@ Energy is the currency of life. Every organism has an energy level.
 The rules are deliberately simple. In order of priority:
 
 1. **Reproduce**, if energy is above the reproduction threshold and a neighbouring cell is free.
-2. **Eat**, if food is within reach.
-3. **Move** (animals only). A herbivore steps to the free neighbouring cell with the most energetic plant. A carnivore, or a herbivore with no plant nearby, steps to a random free cell.
-4. **Rest**, if nothing else is possible.
+2. **Eat**, if food is within reach: a plant in its own cell for a herbivore, a herbivore in a neighbouring cell for a carnivore.
+3. **Hunt** (carnivores only). If a herbivore is within sight, the carnivore runs towards the nearest one, up to its speed in cells. If it gets next to the prey, it attacks in the same tick (a **pounce**). Otherwise it has simply moved closer.
+4. **Move** one cell (animals only). A herbivore steps to the free neighbouring cell with the most energetic plant. A carnivore with no prey in sight, or a herbivore with no plant nearby, steps to a random free cell.
+5. **Rest**, if nothing else is possible.
 
-**Speed.** An animal moves at most **one cell per tick**, diagonals included, and a tick spent moving is a tick not spent eating. Herbivores and carnivores have the same speed, and speed is not (yet) a genome trait. Because animals only see one cell away, an animal with no food next to it wanders at random.
+### Speed and sight
+
+| | Plants | Herbivores | Carnivores |
+|---|---|---|---|
+| Speed (cells per tick) | 0 (never move) | 1, fixed | **evolves** from 1 to 3 (start: 1) |
+| Sight | own cell | the 8 neighbours | **evolves**: vision × speed cells (start: 1.5 × 1 = 1 cell) |
+
+- **Speed** is a genome trait. A carnivore with speed 2 travels up to 2 cells per tick. A fractional speed gives a matching chance of one more cell: speed 1.3 means 1 cell, plus a second one 30% of the time.
+- **Vision** is a genome trait, from 1.5 to 3. The sight distance in cells is vision × speed, rounded down: a carnivore with speed 2 and vision 1.5 sees 3 cells away. So faster carnivores also see further.
+- How sight is computed is part of each species' description. The alternative rule, already available, is vision × the species' *maximum* speed, so that sight does not depend on the individual's speed. This keeps the model open to different kinds of carnivore in the future.
+- Running costs the move cost **for every cell travelled**, so speed is useful but expensive.
+- Movement is one cell at a time, diagonals included. Distances are measured the same way: the number of such steps.
 
 ## 7. Reproduction
 
@@ -75,7 +87,7 @@ The rules are deliberately simple. In order of priority:
 
 ## 8. Genome, mutation and the trade-off
 
-Every organism carries its own **genome** of five traits:
+Every organism carries its own **genome** of seven traits:
 
 | Trait | Meaning | Kind |
 |---|---|---|
@@ -84,10 +96,12 @@ Every organism carries its own **genome** of five traits:
 | maxAge | maximum age in ticks | advantage when **higher** |
 | reproductionThreshold | energy needed to reproduce | strategy |
 | offspringShare | share of energy given to the offspring | strategy |
+| speed | cells travelled per tick (carnivores only, 1 to 3) | advantage when **higher** |
+| vision | sight as a multiple of speed (carnivores only, 1.5 to 3) | advantage when **higher** |
 
 **Mutation (on by default).** At birth, each trait of the offspring has a 10% chance of changing by a small random amount, typically about 5% of its value.
 
-**Trade-off (on by default).** A species cannot improve everything at once. Each genome gets an *advantage* score measured against its species' founder genome (the starting one), counting only the three advantage traits. The score cannot go above zero, so a better intake must be paid for with, for example, a higher metabolism or a shorter life. A mutation that would break this rule is discarded, and the offspring is an exact copy of its parent. The two strategy traits are not part of the budget and drift freely.
+**Trade-off (on by default).** A species cannot improve everything at once. Each genome gets an *advantage* score measured against its species' founder genome (the starting one), counting only the advantage traits (metabolism, intake, max age, speed, vision). The score cannot go above zero, so a better intake, or a faster carnivore, must be paid for with, for example, a higher metabolism or a shorter life. A mutation that would break this rule is discarded, and the offspring is an exact copy of its parent. The two strategy traits are not part of the budget and drift freely.
 
 ## 9. Reading the map
 
@@ -121,6 +135,6 @@ The parameters are a first guess, not a calibration. With the defaults:
 
 - **Plants** quickly cover almost the whole grid.
 - **Herbivores** crash from 1,000 to about 10–20 within the first 100 ticks. Only a handful are left at tick 1,000, so in some runs they may die out.
-- **Carnivores** die out within the first 100 ticks: they first eat most of the herbivores, then starve.
+- **Carnivores** die out within the first 100 ticks: they first eat most of the herbivores, then starve. Being able to hunt at a distance has not changed this yet: they die before speed and vision have time to evolve.
 
 Balancing the carnivores is a known open question (O2 in [decisions.md](decisions.md)), parked for now.

@@ -22,6 +22,8 @@ Status of each decision: **Agreed** (you decided), **Assumed** (I chose it to ma
 | A14 | The carnivore survival problem (O2) is parked for now. |
 | A15 | Starting populations are **densities** (fractions of the cells), so they follow the grid size. Defaults (prompt 11): plants **0.50**, herbivores **0.20**, carnivores **0.04**, i.e. 50 / 20 / 4 per 100 cells (until then 0.30 / 0.10 / 0.02). Counts are rounded to the nearest whole organism. |
 | A16 | A **Manual** button in the viewer opens `docs/manual.md` in a separate window. The Markdown is converted to HTML with the **commonmark-java** library (0.32.0, with the tables extension). The build copies `docs/*.md` and `docs/images/` into the application, so the window always shows the same text as the repository. |
+| A17 | Carnivore **speed** is a genome trait, evolving from **1** to a **maximum speed** set per simulation (default **3**). Carnivores also have a **vision** trait, from **1.5** to **3**: sight distance = vision × a base speed. |
+| A18 | **How sight is computed is part of each species' description** (`Mobility.visionBase`), to allow different kinds of carnivore later: vision × the organism's own speed (default for carnivores) or vision × the species' maximum speed. |
 
 ## Assumed (please review)
 
@@ -60,7 +62,7 @@ Status of each decision: **Agreed** (you decided), **Assumed** (I chose it to ma
 
 | # | Assumption |
 |---|---|
-| G1 | Genome traits: `metabolism`, `intake`, `reproductionThreshold`, `offspringShare`, `maxAge`. Every organism carries its own genome, so mutation can later act on each trait. |
+| G1 | Genome traits: `metabolism`, `intake`, `reproductionThreshold`, `offspringShare`, `maxAge`, and (prompt 16) `speed`, `vision`. Every organism carries its own genome, so mutation can later act on each trait. |
 | G2 | Mutation is pluggable (`Mutation`); the settings (`MutationSettings`) choose the implementation. Default: **on, trade-off on**. Command line: `--mutation on|off`, `--trade-off on|off`. |
 | G3 | **Small random changes** (`GaussianMutation`): at birth each trait, independently, changes with probability **10%** by a relative amount drawn from a normal distribution with σ = **5%**: `new = clamp(value × (1 + N(0, 0.05)))`. Each trait has a valid range (`Trait`) and is clamped to it. |
 | G4 | **Trade-off budget** (`TraitBudget`). The *advantage* of a genome is measured against the **founder** genome of its species (the starting genome in the configuration), as a sum of log-ratios: `ln(intake/intake₀) + ln(maxAge/maxAge₀) − ln(metabolism/metabolism₀)`. Logarithms make traits with different scales comparable: doubling the intake is worth as much as halving the metabolism. A genome is allowed when its advantage is ≤ the **allowance** (default **0**: the founders sit exactly on the limit). The budget is measured against the founder, not the parent, so it cannot creep upwards over generations. |
@@ -68,12 +70,26 @@ Status of each decision: **Agreed** (you decided), **Assumed** (I chose it to ma
 | G6 | When a mutated genome exceeds the budget, the mutation is **rejected** and the offspring gets the parent's genome. *Alternative:* repair it, by worsening the other traits until the genome fits. Rejection is simpler and does not invent changes that did not happen. |
 | G7 | A trait whose founder value is 0 (e.g. intake 0) stays 0 (the change is relative) and is left out of the budget. |
 
+### Speed, sight and hunting (prompt 16; you did not choose these, please review)
+
+| # | Assumption | Alternative |
+|---|---|---|
+| M1 | **Pounce:** a carnivore can run towards a prey and attack it in the same tick, if it gets next to it. | Moving takes the whole tick; attack on the next one. |
+| M2 | Moving costs the move cost **per cell travelled**. | The same cost at any speed. |
+| M3 | **Speed and vision count in the trade-off budget** (higher is better). The founder carnivores start at the minimum: speed 1, vision 1.5. | Outside the budget, limited only by the cost of moving. |
+| M4 | A **fractional speed** gives a matching chance of one extra cell (1.3 = a second cell 30% of the time), so that small mutations have an effect. Sight is rounded down: `floor(vision × base)`, at least 1. | Round speed to whole cells (small mutations then have no effect until they cross a whole number). |
+| M5 | The carnivore runs **greedily**: each step goes to a free neighbouring cell that is closest to the prey (ties at random). It goes around other animals, but does not plan a full path. It targets the **nearest** visible prey. | Shortest-path search; preferring the weakest prey. |
+| M6 | With no prey in sight, a carnivore **wanders one cell**, not at full speed, to save energy. | Wander at full speed. |
+| M7 | Herbivores and plants also carry speed and vision traits, fixed at 1 (`Mobility.FIXED`). Herbivore behaviour is unchanged: speed 1, sees only its neighbours. | Let herbivores evolve speed and sight too (e.g. to flee). |
+| M8 | A failed attack (prey gone) still costs the eat cost. | |
+| M9 | Command line: `--carnivore-max-speed N`. Vision range and sight rule are set in code. | |
+
 ### Behaviour and tick order
 
 | # | Assumption | Alternative |
 |---|---|---|
-| T1 | Organisms see only their own cell and the 8 neighbours. | A sense range (a genome trait?). |
-| T2 | Decision rules, by priority: reproduce → eat → move (herbivores prefer the neighbouring cell with the richest plant; otherwise a random free cell) → rest. | Genome-driven or learned behaviour. |
+| T1 | Plants and herbivores see only their own cell and the 8 neighbours. Carnivores see further (A17). | A sense range (a genome trait?). |
+| T2 | Decision rules, by priority: reproduce → eat → hunt (carnivores) → move (herbivores prefer the neighbouring cell with the richest plant; otherwise a random free cell) → rest. | Genome-driven or learned behaviour. |
 | T3 | Deciding (`Behaviour`) is separate from executing (`Simulation`), so rules can change without touching the energy bookkeeping. | |
 | T4 | Tick order: resource regenerates → all plants act (random order) → all animals act (random order) → dead removed. | All organisms in one random order; simultaneous update (everyone decides on the same snapshot, then conflicts are resolved). |
 | T5 | A run has a fixed length (`--ticks`, default **1000**, the same in the viewer and headless). The viewer shows `Tick n / total` and pauses at the end. Before this, the viewer ran without limit and headless defaulted to 100 ticks. | Viewer without limit unless `--ticks` is given. |

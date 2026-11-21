@@ -1,6 +1,5 @@
 package it.brunasti.simulations.toroworld.sim;
 
-import it.brunasti.simulations.toroworld.life.ActivityCosts;
 import it.brunasti.simulations.toroworld.life.Organism;
 
 import java.util.random.RandomGenerator;
@@ -13,5 +12,11 @@ import java.util.random.RandomGenerator;
 @FunctionalInterface
 public interface Behaviour {
 
-    Intent decide(Organism self, World world, ActivityCosts costs, RandomGenerator random);
+    /**
+     * @param self    the organism deciding
+     * @param world   the current state of the world, to look at (not to change)
+     * @param species the description of the organism's species: costs, mobility, ...
+     * @param random  the simulation's random generator, the only source of randomness allowed
+     */
+    Intent decide(Organism self, World world, SpeciesConfig species, RandomGenerator random);
 }

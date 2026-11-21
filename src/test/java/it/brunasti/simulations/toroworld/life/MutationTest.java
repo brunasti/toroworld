@@ -23,6 +23,8 @@ class MutationTest {
             assertEquals(trait == Trait.OFFSPRING_SHARE ? 0.7 : 7.0, changed.get(trait), 1e-9);
         }
         assertEquals(101, FOUNDER.with(Trait.MAX_AGE, 100.6).maxAge());
+        assertEquals(1.0, FOUNDER.speed());
+        assertEquals(1.0, FOUNDER.vision());
     }
 
     @Test
@@ -69,6 +71,27 @@ class MutationTest {
                 assertTrue(v >= trait.minimum() && v <= trait.maximum(), trait + " out of range: " + v);
             }
         }
+    }
+
+    @Test
+    void speciesRangesOverrideTheDefaultRanges() {
+        Genome hunter = new Genome(1.0, 4.0, 20.0, 0.4, 100, 2.9, 2.9);
+        Mutation mutation = new GaussianMutation(1.0, 0.5, null, Map.of(Species.CARNIVORE, Map.of(
+                Trait.SPEED, new TraitRange(1, 3), Trait.VISION, new TraitRange(1.5, 3))));
+        Random random = new Random(4);
+        for (int i = 0; i < 1000; i++) {
+            Genome child = mutation.mutate(Species.CARNIVORE, hunter, random);
+            assertTrue(child.speed() >= 1 && child.speed() <= 3);
+            assertTrue(child.vision() >= 1.5 && child.vision() <= 3);
+        }
+    }
+
+    @Test
+    void fasterMustBePaidForInTheBudget() {
+        Genome hunter = new Genome(1.0, 4.0, 20.0, 0.4, 100, 1.0, 1.5);
+        TraitBudget budget = new TraitBudget(Map.of(Species.CARNIVORE, hunter), 0);
+        assertFalse(budget.allows(Species.CARNIVORE, hunter.with(Trait.SPEED, 2.0)));
+        assertTrue(budget.allows(Species.CARNIVORE, hunter.with(Trait.SPEED, 2.0).with(Trait.METABOLISM, 2.0)));
     }
 
     @Test
