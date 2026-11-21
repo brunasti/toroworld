@@ -46,3 +46,7 @@ OK, as a first starting point it's OK.
 ### 6. 17:07
 
 Yes, please push it, but with which branch name and commit title?
+
+### 7. 17:15
+
+Could you create a document docs/how-to-run.md describing how to configure and run the simulation, as for example where to set the different parameterds?

@@ -31,4 +31,5 @@ In the viewer: **Start/Pause**, **Step** (one tick), **Reset**, and a speed slid
 ## Documentation
 
 - [docs/decisions.md](docs/decisions.md): design decisions, assumptions to review, open questions
+- [docs/how-to-run.md](docs/how-to-run.md): how to build, run and configure the simulation
 - [docs/prompts.md](docs/prompts.md): the prompts that guided the development
