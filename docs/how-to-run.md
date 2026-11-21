@@ -61,8 +61,8 @@ You can pass these options with `--args="..."` (Gradle) or as program arguments 
 
 | Option | Default | Meaning |
 |---|---|---|
-| `--width N` | 10 | Grid width |
-| `--height N` | 10 | Grid height |
+| `--width N` | 100 | Grid width |
+| `--height N` | 50 | Grid height |
 | `--seed N` | 42 | Random seed. The same seed and configuration always give the same run. |
 | `--mutation on\|off` | on | `off`: offspring are exact copies of their parent |
 | `--trade-off on\|off` | on | `off`: mutation without the trait budget |
@@ -76,7 +76,7 @@ Example:
 ./gradlew run --args="--width 30 --height 20 --seed 7 --trade-off off --headless --ticks 2000"
 ```
 
-> **Caveat:** changing the grid size does **not** change the starting population. It is still 30 plants, 10 herbivores and 2 carnivores, so a larger grid starts out sparser. To change the populations, see section 5.
+> **Caveat:** the grid size does **not** change the starting population. It is still 30 plants, 10 herbivores and 2 carnivores, so a larger grid starts out sparser. To change the populations, see section 5.
 
 ## 5. Where the parameters are set
 
@@ -88,7 +88,7 @@ All paths below are relative to `src/main/java/it/brunasti/simulations/toroworld
 
 ```java
 return new SimulationConfig(
-        10, 10, 42L,                 // width, height, seed
+        100, 50, 42L,                // width, height, seed
         5.0, 10.0, 1.0,              // resource: initial, maximum, regeneration per tick
         new SpeciesConfig(...),      // plants
         new SpeciesConfig(...),      // herbivores
@@ -139,7 +139,7 @@ new SpeciesConfig(30, 5.0,                                  // initial count, in
 | eat | 0.2 | 0.2 | 0.3 | Feeding |
 | reproduce | 1.0 | 2.0 | 3.0 | Producing one offspring |
 
-> The defaults are a first guess, not a calibration. With them, plants and herbivores usually coexist on 10x10, and carnivores do not survive (open question O2).
+> The defaults are a first guess, not a calibration. They were adjusted on a 10x10 grid, where plants and herbivores usually coexist and carnivores do not survive (open question O2). On the default 100x50 grid, the same starting populations are very sparse and the herbivores die out within about 100 ticks (open question O4).
 
 ### 5.2 Mutation and trade-off: `life/MutationSettings.java`, constant `DEFAULT`
 

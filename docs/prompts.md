@@ -54,3 +54,7 @@ Could you create a document docs/how-to-run.md describing how to configure and r
 ### 8. 17:19
 
 In the bottom bar, where the current tick is displayed, please add next to it also the total number of ticks
+
+### 9. 17:22
+
+Set the default size of the grid to 100x50

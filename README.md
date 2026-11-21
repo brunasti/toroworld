@@ -10,7 +10,7 @@ Requires JDK 25 (or any JDK from 21 with `-PjavaRelease=21`).
 
 ```bash
 ./gradlew build                      # compile and run the tests
-./gradlew run                        # open the Swing viewer (10x10 grid)
+./gradlew run                        # open the Swing viewer (100x50 grid)
 ./gradlew run --args="--width 30 --height 20 --seed 7"
 ./gradlew run --args="--headless --ticks 500"   # print one census line per tick, then the mean traits
 ./gradlew run --args="--mutation off"           # offspring are exact copies

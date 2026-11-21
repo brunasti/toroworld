@@ -7,7 +7,7 @@ Status of each decision: **Agreed** (you decided), **Assumed** (I chose it to ma
 | # | Decision |
 |---|---|
 | A1 | Java application, built with **Gradle**. |
-| A2 | Space is a **discrete grid** whose edges wrap (a torus). Size is configurable; development default **10x10**. |
+| A2 | Space is a **discrete grid** whose edges wrap (a torus). Size is configurable. Default **100x50** (it was 10x10 until the ninth prompt). |
 | A3 | Viewer in **Swing**. |
 | A4 | Time is **discrete** (ticks). |
 | A5 | Each cell has a renewable resource that plants consume. |
@@ -90,6 +90,10 @@ Measured with the default parameters over 10 to 20 seeds and 1,000 ticks: plants
 - carnivores that sense prey at a distance (otherwise they wander at random);
 - a satiety limit, so they stop hunting when full;
 - calibrating the energy flows instead of guessing parameters.
+
+### O4. Starting populations on the 100x50 grid
+
+The starting populations (30 plants, 10 herbivores, 2 carnivores) were chosen for 10x10. On 100x50 (50 times more cells) they are very sparse. In 3 of 3 seeds the herbivores died out before tick 100, and plants filled the grid. With the populations scaled to the area (1,500 / 500 / 100), herbivores survived 1,000 ticks in 5 of 5 seeds, at low numbers (16 to 36). Options: scale the defaults to the area; express the populations as densities (per 100 cells) so they follow the grid size automatically; or keep fixed counts.
 
 ### O3. Others still to decide
 

@@ -34,13 +34,14 @@ public record SimulationConfig(
     }
 
     /**
-     * Development defaults: a 10x10 grid. The numbers are a first guess, adjusted
-     * only so that plants and herbivores usually coexist. They are not calibrated:
-     * on a 10x10 grid the carnivores currently wipe out the herbivores and then starve.
+     * Development defaults: a 100x50 grid. The species numbers are a first guess,
+     * adjusted only on a 10x10 grid so that plants and herbivores usually coexist there.
+     * They are not calibrated, and the starting populations were not scaled up
+     * when the grid grew to 100x50: there the herbivores currently die out early.
      */
     public static SimulationConfig defaults() {
         return new SimulationConfig(
-                10, 10, 42L,
+                100, 50, 42L,
                 5.0, 10.0, 1.0,
                 new SpeciesConfig(30, 5.0,
                         new Genome(1.0, 3.0, 8.0, 0.4, 60),
