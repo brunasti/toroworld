@@ -24,6 +24,8 @@ Status of each decision: **Agreed** (you decided), **Assumed** (I chose it to ma
 | A16 | A **Manual** button in the viewer opens `docs/manual.md` in a separate window. The Markdown is converted to HTML with the **commonmark-java** library (0.32.0, with the tables extension). The build copies `docs/*.md` and `docs/images/` into the application, so the window always shows the same text as the repository. |
 | A17 | Carnivore **speed** is a genome trait, evolving from **1** to a **maximum speed** set per simulation (default **3**). Carnivores also have a **vision** trait, from **1.5** to **3**: sight distance = vision × a base speed. |
 | A18 | **How sight is computed is part of each species' description** (`Mobility.visionBase`), to allow different kinds of carnivore later: vision × the organism's own speed (default for carnivores) or vision × the species' maximum speed. |
+| A19 | A **fractional speed** gives a matching chance of one extra cell per tick (M4). |
+| A20 | With no prey in sight, a carnivore **wanders one cell** per tick (M6). Agreed **for now**: to be revisited. |
 
 ## Assumed (please review)
 
@@ -77,9 +79,9 @@ Status of each decision: **Agreed** (you decided), **Assumed** (I chose it to ma
 | M1 | **Pounce:** a carnivore can run towards a prey and attack it in the same tick, if it gets next to it. | Moving takes the whole tick; attack on the next one. |
 | M2 | Moving costs the move cost **per cell travelled**. | The same cost at any speed. |
 | M3 | **Speed and vision count in the trade-off budget** (higher is better). The founder carnivores start at the minimum: speed 1, vision 1.5. | Outside the budget, limited only by the cost of moving. |
-| M4 | A **fractional speed** gives a matching chance of one extra cell (1.3 = a second cell 30% of the time), so that small mutations have an effect. Sight is rounded down: `floor(vision × base)`, at least 1. | Round speed to whole cells (small mutations then have no effect until they cross a whole number). |
+| M4 | **Agreed (A19).** A **fractional speed** gives a matching chance of one extra cell (1.3 = a second cell 30% of the time), so that small mutations have an effect. Sight is rounded down: `floor(vision × base)`, at least 1. | Round speed to whole cells (small mutations then have no effect until they cross a whole number). |
 | M5 | The carnivore runs **greedily**: each step goes to a free neighbouring cell that is closest to the prey (ties at random). It goes around other animals, but does not plan a full path. It targets the **nearest** visible prey. | Shortest-path search; preferring the weakest prey. |
-| M6 | With no prey in sight, a carnivore **wanders one cell**, not at full speed, to save energy. | Wander at full speed. |
+| M6 | **Agreed for now (A20).** With no prey in sight, a carnivore **wanders one cell**, not at full speed, to save energy. | Wander at full speed. |
 | M7 | Herbivores and plants also carry speed and vision traits, fixed at 1 (`Mobility.FIXED`). Herbivore behaviour is unchanged: speed 1, sees only its neighbours. | Let herbivores evolve speed and sight too (e.g. to flee). |
 | M8 | A failed attack (prey gone) still costs the eat cost. | |
 | M9 | Command line: `--carnivore-max-speed N`. Vision range and sight rule are set in code. | |
