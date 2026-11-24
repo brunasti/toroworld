@@ -1,0 +1,306 @@
+package it.brunasti.simulations.toroworld.sim;
+
+import it.brunasti.simulations.toroworld.life.Activity;
+import it.brunasti.simulations.toroworld.life.ActivityCosts;
+import it.brunasti.simulations.toroworld.life.Animal;
+import it.brunasti.simulations.toroworld.life.Genome;
+import it.brunasti.simulations.toroworld.life.MutationSettings;
+import it.brunasti.simulations.toroworld.life.Plant;
+import it.brunasti.simulations.toroworld.life.Species;
+import it.brunasti.simulations.toroworld.world.Position;
+import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+class SimulationTest {
+
+    private static final double EPS = 1e-9;
+    private static final Position CENTRE = new Position(1, 1);
+    private static final Position CORNER = new Position(0, 0);
+    private static final ActivityCosts FREE = new ActivityCosts(0, 0, 0, 0, 0);
+
+    /** A 3x3 world with no starting population and explicit species parameters. */
+    private static SimulationConfig emptyWorld(SpeciesConfig plants, SpeciesConfig herbivores,
+                                               SpeciesConfig carnivores) {
+        return new SimulationConfig(3, 3, 7L, 5, 10, 1,
+                plants, herbivores, carnivores, MutationSettings.OFF);
+    }
+
+    private static SpeciesConfig species(Genome genome, ActivityCosts costs, double efficiency) {
+        return new SpeciesConfig(0, 1, genome, costs, efficiency);
+    }
+
+    private static Genome genome(double intake) {
+        return new Genome(1.0, intake, 1000, 0.4, 1000);
+    }
+
+    @Test
+    void plantAbsorbsResourceAndPaysEatAndLiveCosts() {
+        SimulationConfig config = emptyWorld(
+                species(genome(3), new ActivityCosts(0.5, 0, 0, 0.2, 0), 0.8),
+                species(genome(1), FREE, 1), species(genome(1), FREE, 1));
+        Simulation sim = new Simulation(config, (self, world, species, random) ->
+                new Intent(Activity.EAT, self.position()));
+        Plant plant = new Plant(100, config.plants().genome(), CENTRE, 5);
+        sim.world().add(plant);
+
+        sim.step();
+
+        // resource: 5 + 1 regenerated - 3 taken
+        assertEquals(3.0, sim.world().resources().level(CENTRE), EPS);
+        // energy: 5 + 3 * 0.8 - (0.2 eat + 0.5 live)
+        assertEquals(6.7, plant.energy(), EPS);
+        assertEquals(1, plant.age());
+    }
+
+    @Test
+    void herbivoreGrazesThePlantInItsCell() {
+        SimulationConfig config = emptyWorld(
+                species(genome(0), new ActivityCosts(0.5, 0, 0, 0, 0), 1),
+                species(genome(2), new ActivityCosts(0.4, 0, 0, 0.2, 0), 0.5),
+                species(genome(1), FREE, 1));
+        Simulation sim = new Simulation(config, (self, world, species, random) ->
+                self.species() == Species.HERBIVORE ? new Intent(Activity.EAT, self.position()) : Intent.REST);
+        Plant plant = new Plant(100, config.plants().genome(), CENTRE, 5);
+        Animal herbivore = new Animal(101, Species.HERBIVORE, config.herbivores().genome(), CENTRE, 10);
+        sim.world().add(plant);
+        sim.world().add(herbivore);
+
+        sim.step();
+
+        // plants act first: 5 - 0.5 live; then grazed by 2
+        assertEquals(2.5, plant.energy(), EPS);
+        // 10 + 2 * 0.5 - (0.2 eat + 0.4 live)
+        assertEquals(10.4, herbivore.energy(), EPS);
+    }
+
+    @Test
+    void carnivoreKillsAdjacentHerbivore() {
+        SimulationConfig config = emptyWorld(
+                species(genome(0), FREE, 1),
+                species(genome(1), FREE, 1),
+                species(genome(15), new ActivityCosts(0.6, 0, 0, 0.3, 0), 0.5));
+        Simulation sim = new Simulation(config, (self, world, species, random) ->
+                self.species() == Species.CARNIVORE ? new Intent(Activity.EAT, CORNER) : Intent.REST);
+        Animal prey = new Animal(100, Species.HERBIVORE, config.herbivores().genome(), CORNER, 6);
+        Animal hunter = new Animal(101, Species.CARNIVORE, config.carnivores().genome(), CENTRE, 10);
+        sim.world().add(prey);
+        sim.world().add(hunter);
+
+        Census census = sim.step();
+
+        assertFalse(prey.isAlive());
+        assertFalse(sim.world().hasAnimal(CORNER));
+        // 10 + 6 * 0.5 - (0.3 eat + 0.6 live)
+        assertEquals(12.1, hunter.energy(), EPS);
+        assertEquals(0, census.herbivores());
+        assertEquals(1, census.carnivores());
+    }
+
+    @Test
+    void reproductionSplitsEnergyAndOffspringWaitsForNextTick() {
+        SimulationConfig config = emptyWorld(
+                species(new Genome(1.0, 0, 10, 0.4, 1000), new ActivityCosts(0.5, 0, 0, 0, 1), 1),
+                species(genome(1), FREE, 1), species(genome(1), FREE, 1));
+        Position childCell = new Position(1, 2);
+        Simulation sim = new Simulation(config, (self, world, species, random) ->
+                self.age() == 0 && self.id() == 100 ? new Intent(Activity.REPRODUCE, childCell) : Intent.REST);
+        Plant parent = new Plant(100, config.plants().genome(), CENTRE, 20);
+        sim.world().add(parent);
+
+        sim.step();
+
+        // available = 20 - 1 reproduce - 0.5 live = 18.5; child gets 40%
+        Plant child = sim.world().plantAt(childCell).orElseThrow();
+        assertEquals(7.4, child.energy(), EPS);
+        assertEquals(0, child.age(), "offspring must not act in the tick it is born");
+        assertEquals(20 - 1.5 - 7.4, parent.energy(), EPS);
+    }
+
+    @Test
+    void offspringGenomeComesFromTheMutation() {
+        Genome parentGenome = new Genome(1.0, 0, 10, 0.5, 50);
+        Genome mutated = new Genome(1.1, 0, 10, 0.5, 60);
+        SimulationConfig config = emptyWorld(
+                species(parentGenome, FREE, 1), species(genome(1), FREE, 1), species(genome(1), FREE, 1));
+        Position childCell = new Position(2, 1);
+        Simulation sim = new Simulation(config, (self, world, species, random) ->
+                self.id() == 100 && self.age() == 0 ? new Intent(Activity.REPRODUCE, childCell) : Intent.REST,
+                (species, parent, random) -> mutated);
+        sim.world().add(new Plant(100, parentGenome, CENTRE, 20));
+
+        sim.step();
+
+        assertSame(mutated, sim.world().plantAt(childCell).orElseThrow().genome());
+    }
+
+    @Test
+    void withMutationOnGenomesDriftAndStayWithinTheBudget() {
+        SimulationConfig config = SimulationConfig.defaults().withSize(20, 20).withDensities(0.30, 0, 0);
+        // Plants only: with herbivores, the plants of some seeds are grazed to extinction.
+        Simulation sim = new Simulation(config);
+        var budget = new it.brunasti.simulations.toroworld.life.TraitBudget(java.util.Map.of(
+                Species.PLANT, config.plants().genome(),
+                Species.HERBIVORE, config.herbivores().genome(),
+                Species.CARNIVORE, config.carnivores().genome()), 0);
+        for (int t = 0; t < 300; t++) {
+            sim.step();
+        }
+        List<Plant> plants = sim.world().plants();
+        assertTrue(plants.stream().anyMatch(p -> !p.genome().equals(config.plants().genome())),
+                "after 300 ticks some plant genomes should have mutated");
+        assertTrue(plants.stream().allMatch(p -> budget.allows(Species.PLANT, p.genome())));
+    }
+
+    @Test
+    void withMutationOffGenomesNeverChange() {
+        SimulationConfig config = SimulationConfig.defaults().withMutation(MutationSettings.OFF);
+        Simulation sim = new Simulation(config);
+        for (int t = 0; t < 200; t++) {
+            sim.step();
+        }
+        assertTrue(sim.world().plants().stream().allMatch(p -> p.genome().equals(config.plants().genome())));
+    }
+
+    @Test
+    void pounceRunsAlongTheRouteKillsThePreyAndPaysPerCell() {
+        SimulationConfig config = new SimulationConfig(9, 9, 7L, 5, 10, 1,
+                species(genome(0), FREE, 1), species(genome(1), FREE, 1),
+                new SpeciesConfig(0, 1, new Genome(1.0, 15, 1000, 0.4, 1000, 2.0, 1.5),
+                        new ActivityCosts(0.6, 0, 0.5, 0.3, 0), 0.5,
+                        new Mobility(3, 1.5, 3, Mobility.VisionBase.OWN_SPEED)),
+                MutationSettings.OFF);
+        Behaviour simple = new SimpleBehaviour();
+        // Only the carnivore follows the rules; the prey stays still, so the test is deterministic.
+        Simulation sim = new Simulation(config, (self, world, species, random) ->
+                self.species() == Species.CARNIVORE ? simple.decide(self, world, species, random) : Intent.REST);
+        Position start = new Position(1, 1);
+        Position preyCell = new Position(4, 1);
+        Animal hunter = new Animal(100, Species.CARNIVORE, config.carnivores().genome(), start, 10);
+        Animal prey = new Animal(101, Species.HERBIVORE, config.herbivores().genome(), preyCell, 6);
+        sim.world().add(hunter);
+        sim.world().add(prey);
+
+        sim.step();
+
+        assertFalse(prey.isAlive());
+        // Two cells travelled (Chebyshev distance), ending next to where the prey was.
+        assertEquals(2, sim.world().torus().distance(start, hunter.position()));
+        assertEquals(1, sim.world().torus().distance(hunter.position(), preyCell));
+        // 10 + 6 * 0.5 - (2 cells * 0.5 move + 0.3 eat + 0.6 live)
+        assertEquals(11.1, hunter.energy(), EPS);
+    }
+
+    @Test
+    void carnivoreTraitsStayWithinTheSpeciesRanges() {
+        SimulationConfig config = SimulationConfig.defaults().withSize(30, 30)
+                .withMutation(new MutationSettings(true, 1.0, 0.3, false, 0));
+        Simulation sim = new Simulation(config);
+        for (int t = 0; t < 100; t++) {
+            sim.step();
+            for (Animal a : sim.world().animals()) {
+                Genome g = a.genome();
+                if (a.species() == Species.CARNIVORE) {
+                    assertTrue(g.speed() >= 1 && g.speed() <= 3, "speed " + g.speed());
+                    assertTrue(g.vision() >= 1.5 && g.vision() <= 3, "vision " + g.vision());
+                } else {
+                    assertEquals(1.0, g.speed());
+                    assertEquals(1.0, g.vision());
+                }
+            }
+        }
+    }
+
+    @Test
+    void censusReportsTheEnergyOfEachSpecies() {
+        SimulationConfig config = emptyWorld(species(genome(0), FREE, 1), species(genome(1), FREE, 1),
+                species(genome(1), FREE, 1));
+        Simulation sim = new Simulation(config);
+        sim.world().add(new Plant(1, config.plants().genome(), CORNER, 2.5));
+        sim.world().add(new Plant(2, config.plants().genome(), CENTRE, 4));
+        sim.world().add(new Animal(3, Species.HERBIVORE, config.herbivores().genome(), CORNER, 7));
+        sim.world().add(new Animal(4, Species.CARNIVORE, config.carnivores().genome(), CENTRE, 11));
+
+        Census census = sim.census();
+
+        assertEquals(6.5, census.plantEnergy(), EPS);
+        assertEquals(7.0, census.herbivoreEnergy(), EPS);
+        assertEquals(11.0, census.carnivoreEnergy(), EPS);
+        assertEquals(45.0, census.resource(), EPS);
+    }
+
+    @Test
+    void sameSeedGivesTheSameRun() {
+        assertEquals(run(SimulationConfig.defaults(), 200), run(SimulationConfig.defaults(), 200));
+    }
+
+    @Test
+    void differentSeedsGiveDifferentRuns() {
+        assertNotEquals(run(SimulationConfig.defaults().withSeed(1), 50),
+                run(SimulationConfig.defaults().withSeed(2), 50));
+    }
+
+    @Test
+    void startingPopulationFollowsTheDensitiesAndTheGridSize() {
+        Census start = new Simulation(SimulationConfig.defaults()).census();
+        assertEquals(0, start.tick());
+        assertEquals(2500, start.plants());
+        assertEquals(1000, start.herbivores());
+        assertEquals(200, start.carnivores());
+
+        Census small = new Simulation(SimulationConfig.defaults().withSize(10, 10)).census();
+        assertEquals(50, small.plants());
+        assertEquals(20, small.herbivores());
+        assertEquals(4, small.carnivores());
+    }
+
+    @Test
+    void countsAreRoundedToTheNearestWholeOrganism() {
+        // 7x7 = 49 cells: 30% = 14.7 -> 15, 10% = 4.9 -> 5, 2% = 0.98 -> 1
+        Census start = new Simulation(SimulationConfig.defaults().withSize(7, 7)
+                .withDensities(0.30, 0.10, 0.02)).census();
+        assertEquals(15, start.plants());
+        assertEquals(5, start.herbivores());
+        assertEquals(1, start.carnivores());
+    }
+
+    @Test
+    void densitiesThatDoNotFitTheGridAreRejected() {
+        assertThrows(IllegalArgumentException.class,
+                () -> SimulationConfig.defaults().withDensities(0.3, 0.7, 0.4));
+        assertThrows(IllegalArgumentException.class,
+                () -> SimulationConfig.defaults().withDensities(1.2, 0.1, 0.0));
+    }
+
+    @Test
+    void cellsHoldAtMostOnePlantAndOneAnimalThroughoutARun() {
+        Simulation sim = new Simulation(SimulationConfig.defaults().withSeed(3));
+        for (int t = 0; t < 300; t++) {
+            sim.step();
+            var world = sim.world();
+            assertEquals(world.plants().size(),
+                    world.plants().stream().map(Plant::position).distinct().count());
+            assertEquals(world.animals().size(),
+                    world.animals().stream().map(Animal::position).distinct().count());
+            assertTrue(world.plants().stream().allMatch(Plant::isAlive));
+            assertTrue(world.animals().stream().allMatch(Animal::isAlive));
+        }
+    }
+
+    private static List<Census> run(SimulationConfig config, int ticks) {
+        Simulation sim = new Simulation(config);
+        List<Census> history = new ArrayList<>();
+        for (int t = 0; t < ticks; t++) {
+            history.add(sim.step());
+        }
+        return history;
+    }
+}
